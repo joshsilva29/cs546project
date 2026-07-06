@@ -1,0 +1,25 @@
+{
+  "name": "cs546project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joshsilva29/cs546project.git"
+  },
+  "author": "jeffrey kersh, samuel malwal, lord gerald marapao, aaron shieh, joshua silva, carlos orta",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joshsilva29/cs546project/issues"
+  },
+  "homepage": "https://github.com/joshsilva29/cs546project#readme",
+  "dependencies": {
+    "express": "^5.2.1",
+    "mongodb": "^7.4.0"
+  }
+}
