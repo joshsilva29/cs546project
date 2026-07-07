@@ -1,6 +1,6 @@
-// import usersRoutes from "./users.js";
+import usersRoutes from "./users.js";
 // import closuresRoutes from "./closures.js";
-// import nycClosuresRoutes from "./nycClosures.js";
+import nycClosuresRoutes from "./nycClosures.js";
 
 const configureRoutes = (app) => {
     app.use('/users', usersRoutes);

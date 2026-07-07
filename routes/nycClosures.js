@@ -4,7 +4,7 @@ const router = Router();
 router
   .route('/')
   .get(async (req, res) => {
-    return res.send('POST request to http://localhost:3000/nycClosures');
+    return res.send('GET request to http://localhost:3000/nycClosures');
   })
   .post(async (req, res) => {
     return res.send('POST request to http://localhost:3000/nycClosures');
