@@ -19,7 +19,9 @@
   },
   "homepage": "https://github.com/joshsilva29/cs546project#readme",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "express": "^5.2.1",
-    "mongodb": "^7.4.0"
+    "mongodb": "^7.4.0",
+    "uuid": "^14.0.1"
   }
 }

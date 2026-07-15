@@ -1,29 +1,65 @@
 import {Router} from 'express';
+import {usersData} from '../data/index.js';
 const router = Router();
+
+router
+  .route('/')
+  .post(async (req, res) => {
+    //create a new user (register)
+    try {
+      const {first_name, last_name, email, password} = req.body;
+      const user = await usersData.createUser(first_name, last_name, email, password);
+      return res.status(201).json(user);
+    } catch (e) {
+      return res.status(400).json({error: e.message});
+    }
+  });
 
 router
   .route('/:id')
   .get(async (req, res) => {
     //get user from id
-    return res.send(`GET request to http://localhost:3000/users/${req.params.id}`);
+    try {
+      const user = await usersData.getUserById(req.params.id);
+      return res.json(user);
+    } catch (e) {
+      return res.status(404).json({error: e.message});
+    }
   });
 
 router
   .route('/user_places/:id')
   .get(async (req, res) => {
     //get all saved steets for a certain user
-    return res.send(`POST request to http://localhost:3000/users/user_places/${req.params.id}`);
+    try {
+      const places = await usersData.getUserPlaces(req.params.id);
+      return res.json(places);
+    } catch (e) {
+      return res.status(404).json({error: e.message});
+    }
   });
 
 router
   .route('/user_places/street/:id')
   .post(async (req, res) => {
     //add street to user's saved streets (user_places field)
-    return res.send(`POST request to http://localhost:3000/users/user_places/street/${req.params.id}`);
+    try {
+      const {street} = req.body;
+      const user = await usersData.addUserPlace(req.params.id, street);
+      return res.json(user);
+    } catch (e) {
+      return res.status(400).json({error: e.message});
+    }
   })
   .delete(async (req, res) => {
     //delete street to user's saved streets (user_places field)
-    return res.send(`DELETE request to http://localhost:3000/users/user_places/street/${req.params.id}`);
+    try {
+      const {street} = req.body;
+      const user = await usersData.removeUserPlace(req.params.id, street);
+      return res.json(user);
+    } catch (e) {
+      return res.status(400).json({error: e.message});
+    }
   });
 
 
