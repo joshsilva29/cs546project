@@ -9,7 +9,8 @@
 
 import { userCollection } from '../config/mongoCollections.js';
 import { checkString, checkEmail, checkId } from '../helpers.js';
-import { v4 as uuid } from 'uuid';
+// import { v4 as uuid } from 'uuid';
+import { ObjectId } from "mongodb";
 import bcrypt from 'bcryptjs';
 
 
@@ -40,7 +41,7 @@ export const createUser = async (first_name, last_name, email, password) => {
   const hashed_password = await bcrypt.hash(password, SALT_ROUNDS);
 
   const newUser = {
-    _id: uuid(),
+    _id: new ObjectId(),
     first_name,
     last_name,
     email,
@@ -51,14 +52,14 @@ export const createUser = async (first_name, last_name, email, password) => {
   const insertInfo = await users.insertOne(newUser);
   if (!insertInfo.acknowledged) throw new Error('Could not create user.');
 
-  return await getUserById(newUser._id);
+  return await getUserById(newUser._id.toString());
 };
 
 export const getUserById = async (id) => {
   id = checkId(id, 'user id');
   const users = await userCollection();
   const user = await users.findOne(
-    { _id: id },
+    { _id: new ObjectId(id) },
     { projection: { hashed_password: 0 } } // does not leak password hash
   );
   if (!user) throw 'No user found with that id.';
@@ -80,7 +81,7 @@ export const addUserPlace = async (id, street) => {
   street = checkString(street, 'street');
   const users = await userCollection();
   const updateInfo = await users.updateOne(
-    { _id: id },
+    { _id: new ObjectId(id) },
     { $addToSet: { user_places: street } } // $addToSet avoids duplicate streets
   );
   if (updateInfo.matchedCount === 0) throw 'No user found with that id.';
@@ -92,7 +93,7 @@ export const removeUserPlace = async (id, street) => {
   street = checkString(street, 'street');
   const users = await userCollection();
   const updateInfo = await users.updateOne(
-    { _id: id },
+    { _id: new ObjectId(id) },
     { $pull: { user_places: street } }
   );
   if (updateInfo.matchedCount === 0) throw 'No user found with that id.';
