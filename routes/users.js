@@ -11,7 +11,7 @@ router
       const user = await usersData.createUser(first_name, last_name, email, password);
       return res.status(201).json(user);
     } catch (e) {
-      return res.status(400).json({error: e.message});
+      return res.status(400).json({error: e});
     }
   });
 
@@ -23,7 +23,7 @@ router
       const user = await usersData.getUserById(req.params.id);
       return res.json(user);
     } catch (e) {
-      return res.status(404).json({error: e.message});
+      return res.status(404).json({error: e});
     }
   });
 
@@ -35,7 +35,7 @@ router
       const places = await usersData.getUserPlaces(req.params.id);
       return res.json(places);
     } catch (e) {
-      return res.status(404).json({error: e.message});
+      return res.status(404).json({error: e});
     }
   });
 
@@ -48,7 +48,7 @@ router
       const user = await usersData.addUserPlace(req.params.id, street);
       return res.json(user);
     } catch (e) {
-      return res.status(400).json({error: e.message});
+      return res.status(400).json({error: e});
     }
   })
   .delete(async (req, res) => {
@@ -58,7 +58,7 @@ router
       const user = await usersData.removeUserPlace(req.params.id, street);
       return res.json(user);
     } catch (e) {
-      return res.status(400).json({error: e.message});
+      return res.status(400).json({error: e});
     }
   });
 

@@ -35,7 +35,7 @@ export const createUser = async (first_name, last_name, email, password) => {
   const users = await userCollection();
 
   const existing = await users.findOne({ email });
-  if (existing) throw new Error('A user with that email already exists.');
+  if (existing) throw 'A user with that email already exists.';
 
   const hashed_password = await bcrypt.hash(password, SALT_ROUNDS);
 
@@ -61,7 +61,7 @@ export const getUserById = async (id) => {
     { _id: id },
     { projection: { hashed_password: 0 } } // does not leak password hash
   );
-  if (!user) throw new Error('No user found with that id.');
+  if (!user) throw 'No user found with that id.';
   return user;
 };
 
@@ -83,7 +83,7 @@ export const addUserPlace = async (id, street) => {
     { _id: id },
     { $addToSet: { user_places: street } } // $addToSet avoids duplicate streets
   );
-  if (updateInfo.matchedCount === 0) throw new Error('No user found with that id.');
+  if (updateInfo.matchedCount === 0) throw 'No user found with that id.';
   return await getUserById(id);
 };
 
@@ -95,6 +95,6 @@ export const removeUserPlace = async (id, street) => {
     { _id: id },
     { $pull: { user_places: street } }
   );
-  if (updateInfo.matchedCount === 0) throw new Error('No user found with that id.');
+  if (updateInfo.matchedCount === 0) throw 'No user found with that id.';
   return await getUserById(id);
 };
