@@ -9,5 +9,7 @@
 //
 
 import * as usersData from './users.js';
+import * as closuresData from './closures.js';
 
 export { usersData };
+export { closuresData };
