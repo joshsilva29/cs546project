@@ -1,10 +1,10 @@
 import usersRoutes from "./users.js";
-// import closuresRoutes from "./closures.js";
+import closuresRoutes from "./closures.js";
 import nycClosuresRoutes from "./nycClosures.js";
 
 const configureRoutes = (app) => {
     app.use('/users', usersRoutes);
-    // app.use('/closures', closuresRoutes);
+    app.use('/closures', closuresRoutes);
     app.use('/nycClosures', nycClosuresRoutes);
 
     app.use('/{*splat}', (req, res) => {
