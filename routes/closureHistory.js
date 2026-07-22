@@ -12,7 +12,7 @@ router.get('/closureHistory', async (req, res) => {
   const { borough, status, from, to, limit } = req.query;
  
   const where = [];
-  const now   = new Date().toISOString();
+  const now   = new Date().toISOString().slice(0, -1); //remove the 'Z' at the end of the timestamp
  
   if (borough) where.push(`upper(boroughname)=upper('${borough.replace(/'/g, "''")}')`);
   if (status === 'active') where.push(`workenddate>='${now}'`);
