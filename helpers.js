@@ -68,3 +68,36 @@ export const checkNycCoordinates = (latitude, longitude) => {
   }
   return { latitude: lat, longitude: long };
 };
+
+export const checkLatitude = (lat) => {
+  checkNumber(lat, 'latitude');
+  if (lat < -90 || lat > 90) throw 'Error: latitude must be between -90 and 90.';
+  return lat;
+};
+
+export const checkLongitude = (lng) => {
+  checkNumber(lng, 'longitude');
+  if (lng < -180 || lng > 180) throw 'Error: longitude must be between -180 and 180.';
+  return lng;
+};
+
+export const checkBoolean = (bool, varName) => {
+  if (typeof bool !== 'boolean') throw `Error: ${varName} must be a boolean.`;
+  return bool;
+};
+
+export const checkDateString = (dateStr, varName) => {
+  dateStr = checkString(dateStr, varName);
+  if (Number.isNaN(Date.parse(dateStr))) {
+    throw `Error: ${varName} must be a valid date string (e.g. "2026-06-14").`;
+  }
+  return dateStr;
+};
+
+export const checkSource = (source) => {
+  source = checkString(source, 'source');
+  if (source !== 'official' && source !== 'user') {
+    throw 'Error: source must be either "official" or "user".';
+  }
+  return source;
+};

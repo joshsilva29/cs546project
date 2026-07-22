@@ -1,4 +1,5 @@
 import usersRoutes          from "./users.js";
+import closuresRoutes       from "./closures.js";
 import nycClosuresRoutes    from "./nycClosures.js";
 import reportClosureRoutes  from "./reportClosure.js";
 import durationRoutes       from "./closureDuration.js";
@@ -8,6 +9,7 @@ import searchRoutes         from "./closureSearch.js";
 
 const configureRoutes = (app) => {
     app.use('/users',       usersRoutes);
+    app.use('/closures',    closuresRoutes);
     app.use('/nycClosures', nycClosuresRoutes);
     app.use(reportClosureRoutes);
     app.use(durationRoutes);
