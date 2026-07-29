@@ -1,9 +1,17 @@
 import express from 'express';
 import configureRoutes from './routes/index.js';
 import { usersData, closuresData } from './data/index.js';
+import exphbs from 'express-handlebars';
 
 const app = express();
+
+app.use('/public', express.static('public'));
 app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+
+app.engine('handlebars', exphbs.engine({defaultLayout: 'main'}));
+app.set('view engine', 'handlebars');
+
 configureRoutes(app);
 
 // Ensure database indexes exist before accepting requests.
