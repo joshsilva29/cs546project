@@ -12,6 +12,11 @@
         <input type="text" name="search_input" id="search_input">
         <button type="submit">Submit</button>
     </form>
+    <div id="search-options">
+        <div onclick="toggleOption('all')" id="all">All</div>
+        <div onclick="toggleOption('user-reported')" id="user-reported">User-Reported</div>
+        <div onclick="toggleOption('nyc')" id="nyc">NYC Open Data</div>
+    </div>
 
     <div id="results"></div>
 
