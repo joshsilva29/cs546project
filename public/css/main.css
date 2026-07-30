@@ -1,0 +1,17 @@
+body {
+  margin: 0px;
+  background-color: red;
+}
+
+.nav-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: rgb(108, 157, 108);
+}
+
+.nav-bar-left-container, .nav-bar-right-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
