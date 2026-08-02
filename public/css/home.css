@@ -1,5 +1,7 @@
 :root {
   --main-padding: 15px;
+  --primary-color: #0a2b4d;
+  --secondary-color: #305e8d;
 }
 
 
@@ -19,7 +21,7 @@ button {
 
 a {
   text-decoration: none;
-  color: #0a2b4d;
+  color: var(--primary-color);
 }
 
 a:hover {
@@ -52,12 +54,13 @@ a:hover {
 .nav-bar-right-container {
   display: flex;
   flex-direction: row;
-  gap: 10px;
+  align-items: center;
+  gap: var(--main-padding);
 }
 
 .sidebar {
   width: 260px;
-  background: #0a2b4d;
+  background: var(--primary-color);
   color: white;
   height: 100vh;
   transition: width 0.3s ease;
@@ -91,20 +94,15 @@ a:hover {
   white-space: nowrap;
 }
 
-.notification {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.notification-image {
-  width: 30px;
-}
-
 .sidebar-nav-link {
   display: flex;
   flex-direction: row;
   align-items: center;
+  transition: all 0.3s ease;;
+}
+
+.sidebar-nav-link:hover {
+  background-color: var(--secondary-color);
 }
 
 .sidebar-icon {
@@ -114,3 +112,31 @@ a:hover {
   width: 20px;
   padding-right: 8px;
 }
+
+
+.nav-bar-search {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.nav-bar-profile {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.nav-bar-search-icon {
+  stroke: rgb(72, 72, 72);
+  fill: rgb(72, 72, 72);
+  width: 30px;
+  height: 30px;
+  margin-right: 5px;
+}
+
+.nav-bar-profile-icon {
+  stroke: rgb(72, 72, 72);
+  fill: rgb(72, 72, 72);
+  width: 33px;
+}
+
