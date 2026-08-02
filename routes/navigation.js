@@ -24,4 +24,20 @@ router.get('/savedStreets', async (req, res) => {
     });
 });
 
+router.get('/nearbyClosures', async (req, res) => {
+    return res.render("nearbyClosures", {
+        layout: 'home',
+        css: 'nearbyClosures',
+        title: 'Nearby Closures'
+    });
+});
+
+router.get('/reportClosure', async (req, res) => {
+    return res.render("reportClosure", {
+        layout: 'home',
+        css: 'reportClosure',
+        title: 'Report Closure'
+    });
+});
+
 export default router;
