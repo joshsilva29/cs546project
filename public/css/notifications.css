@@ -1,0 +1,9 @@
+.notification {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.notification-image {
+  width: 30px;
+}
