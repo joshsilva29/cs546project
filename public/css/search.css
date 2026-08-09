@@ -1,9 +1,15 @@
 .closure-element {
-
+    border: 1px solid black;
+    width: 50%;
+    padding-left: 1rem;
 }
 
 .selected-class {
     background-color: gray;
+}
+
+#loading {
+    display: none;
 }
 
 #results {
@@ -16,4 +22,5 @@
 #search-options {
     display: flex;
     gap: 1rem;
+    margin-top: 0.6rem;
 }

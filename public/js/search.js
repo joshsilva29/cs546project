@@ -7,14 +7,26 @@ $("#search_form").submit(async (event) => {
     let street = $("#search_input").val().trim();
     if (!street) alert("You need to provide a street name");
 
+    let loading = "<div >Loading...</div>";
+
     $("#results").empty();
+    $("#results").append(loading);
+
+    let elements = [];
 
     if (searchOption === "all" || searchOption === "user-reported") {
-        await closureSearch(street);
+        let userReportedClosures = await closureSearch(street);
+        elements.push(userReportedClosures);
     }
 
     if (searchOption === "all" || searchOption === "nyc") {
-        await nycClosureSearch(street);
+        let nycClosures = await nycClosureSearch(street);
+        elements.push(nycClosures);
+    }
+
+    $("#results").empty(); //remove loading
+    for (let element of elements) {
+        $("#results").append(element);
     }
 
     $('#search_form').trigger('reset');
@@ -36,11 +48,13 @@ async function closureSearch(street) {
 
     closureResults = await response.json();
 
-    console.log(closureResults);
+    // console.log(closureResults);
+    let elements = [];
 
     if (closureResults.length === 0) {
         let noResultsElement = `<div>No user closures were found for ${street}</div>`;
-        $("#results").append(noResultsElement);
+        elements.push(noResultsElement);
+        // $("#results").append(noResultsElement);
     } else {
         for(let closure of closureResults) {
             let id = closure._id;
@@ -53,15 +67,19 @@ async function closureSearch(street) {
                     <p>From ${fromStreet} to ${toStreet}</p>
                 </div>
             `;
-            $("#results").append(closureElement);
+            elements.push(closureElement);
         }
     }
+    
+    return elements;
 }
 
 async function nycClosureSearch(street) {
     let response, closureResults;
 
     //THIS IS FOR NYC OPEN DATA
+
+    let elements = [];
 
     try {
         response = await fetch(`/closureSearch?street=${street}`);
@@ -82,12 +100,14 @@ async function nycClosureSearch(street) {
                     <p>From ${fromStreet} ${toStreet}</p>
                 </div>
             `;
-            $("#results").append(closureElement);
+            elements.push(closureElement);
         }
     } catch (e) {
         let noResultsElement = `<div>No NYC closures were found for ${street}</div>`;
-        $("#results").append(noResultsElement);
+        elements.push(noResultsElement);
     }
+
+    return elements;
     
 }
 
