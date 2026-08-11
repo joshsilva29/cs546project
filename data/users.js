@@ -86,7 +86,12 @@ export const authenticateUser = async (email, password) => {
   }
 
   if (compareResult) {
-    return user;
+    return {
+      _id: user._id.toString(),
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email
+    };
   } else {
     throw "Either the email or password is invalid";
   }

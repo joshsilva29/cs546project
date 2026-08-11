@@ -20,12 +20,43 @@ router
   .route('/')
   .post(async (req, res) => {
     //create a new user (register)
+    let missingFields = [];
+    try {
+      if (!req.body) throw "All fields are missing.";
+      if (!req.body.first_name) missingFields.push("First Name");
+      if (!req.body.last_name) missingFields.push("Last Name");
+      if (!req.body.email) missingFields.push("Email");
+      if (!req.body.password) missingFields.push("Password");
+
+      if (missingFields.length !== 0) throw "There are missing fields.";
+    } catch (e) {
+      return res.render("register", {
+        layout: 'home',
+        css: 'register',
+        title: 'Register',
+        loggedIn: req.session.user ? true : false,
+        serverError: true,
+        error: e,
+        hasMissingFields: true,
+        missingFields: missingFields
+    });
+    }
+
+    //actual data function call
     try {
       const {first_name, last_name, email, password} = req.body;
       const user = await usersData.createUser(first_name, last_name, email, password);
       return res.redirect("/users/login");
     } catch (e) {
-      return res.status(400).json({error: e});
+      return res.render("register", {
+        layout: 'home',
+        css: 'register',
+        title: 'Register',
+        loggedIn: req.session.user ? true : false,
+        serverError: true,
+        error: e,
+        hasMissingFields: false
+      });
     }
   });
 
