@@ -30,7 +30,7 @@ export const ensureUserIndexes = async () => {
 export const createUser = async (first_name, last_name, email, password) => {
   first_name = checkString(first_name, 'first_name');
   last_name = checkString(last_name, 'last_name');
-  email = checkEmail(email);
+  email = checkEmail(email).toLowerCase();
   password = checkString(password, 'password');
 
   const users = await userCollection();
@@ -64,6 +64,33 @@ export const getUserById = async (id) => {
   );
   if (!user) throw 'No user found with that id.';
   return user;
+};
+
+//josh -- authenticateUser, slightly based on getUserById as above
+export const authenticateUser = async (email, password) => {
+  email = checkEmail(email).toLowerCase();
+  password = checkString(password);
+  const users = await userCollection();
+  const user = await users.findOne(
+    { email: email }
+  );
+  if (!user) throw 'Either the email or password is invalid';
+
+  //compare passwords
+  let compareResult = false;
+
+  try {
+    compareResult = await bcrypt.compare(password, user.hashed_password);
+  } catch (e) {
+    //no op
+  }
+
+  if (compareResult) {
+    return user;
+  } else {
+    throw "Either the email or password is invalid";
+  }
+
 };
 
 export const getAllUsers = async () => {

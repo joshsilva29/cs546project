@@ -1,6 +1,20 @@
 import {Router} from 'express';
 import {usersData} from '../data/index.js';
+import * as helpers from "../helpers.js";
 const router = Router();
+
+//josh (frontend integration) -- load register page for user
+router
+  .route('/')
+  .get(async (req, res) => {
+    //render register page
+    return res.render("register", {
+        layout: 'home',
+        css: 'register',
+        title: 'Register',
+        loggedIn: req.session.user ? true : false
+    });
+  });
 
 router
   .route('/')
@@ -9,11 +23,52 @@ router
     try {
       const {first_name, last_name, email, password} = req.body;
       const user = await usersData.createUser(first_name, last_name, email, password);
-      return res.status(201).json(user);
+      return res.redirect("/users/login");
     } catch (e) {
       return res.status(400).json({error: e});
     }
   });
+
+//josh (frontend integration) -- login routes
+router
+  .route('/login')
+  .get(async (req, res) => {
+    //code here for GET
+    return res.render("login", {
+      layout: 'home',
+      css: 'login',
+      title: 'Login',
+      loggedIn: req.session.user ? true : false
+    });
+  })
+  .post(async (req, res) => {
+    //code here for POST
+    try {
+        if (!req.body || !req.body.email || !req.body.password) throw "Email and password must be supplied";
+        req.body.email = await helpers.checkEmail(req.body.email);
+        req.body.password = await helpers.checkString(req.body.password);
+        let user = await usersData.authenticateUser(req.body.email, req.body.password);
+        req.session.user = user;
+        return res.redirect('/notifications');
+    } catch (e) {
+        return res.status(400).render("login", {
+          statusCode: "400",
+          error: e
+        });
+    }
+  });
+
+
+//josh - logout
+router.route('/logout').get(async (req, res) => {
+  //code here for GET
+  req.session.destroy();
+  return res.render("logout", {
+        layout: 'home',
+        css: 'logout',
+        title: 'Logout'
+    });
+});
 
 router
   .route('/:id')
