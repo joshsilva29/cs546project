@@ -1,4 +1,17 @@
 <h1>Login</h1>
+{{#if serverError}} 
+    <div id="server-error">
+        <p>{{error}}</p>
+        {{#if hasMissingFields}}
+            <ul>
+                {{#each missingFields}}
+                    <li>{{this}}</li>
+                {{/each}}
+            </ul>
+        {{/if}}
+    </div>
+{{/if}}
+<p id="client-error"></p>
 <form id="login-form" action="/users/login" method="POST">
     <label for="email">Email</label>
     <input type="email" id="email" name="email">
@@ -9,3 +22,7 @@
     <button name="submitButton" id="submitButton">Submit</button>
 </form>
 <a href="/users">No account? Register here.</a>
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"
+integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script src="/public/js/form_validate.js"></script>
