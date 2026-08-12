@@ -28,10 +28,19 @@
         <a href="/nearbyClosures" class="sidebar-nav-link">
           Nearby Closures
         </a>
-
         <a href="/reportClosure" class="sidebar-nav-link">
           Report Closure
         </a>
+        {{#if loggedIn}}
+          <a href="/users/logout" class="sidebar-nav-link">
+            Log out
+          </a>
+        {{/if}}
+        {{#unless loggedIn}}
+          <a href="/users/login" class="sidebar-nav-link">
+            Log in
+          </a>
+        {{/unless}}
       </div>
     </div>
     <div class="page-content">

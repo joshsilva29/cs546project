@@ -1,0 +1,33 @@
+<h1>Register</h1>
+{{#if serverError}} 
+    <div id="server-error">
+        <p>{{error}}</p>
+        {{#if hasMissingFields}}
+            <ul>
+                {{#each missingFields}}
+                    <li>{{this}}</li>
+                {{/each}}
+            </ul>
+        {{/if}}
+    </div>
+{{/if}}
+<p id="client-error"></p>
+<form id="signup-form" action="/users/" method="POST">
+    <label for="first_name">First Name</label>
+    <input type="text" id="first_name" name="first_name">
+
+    <label for="last_name">Last Name</label>
+    <input type="text" id="last_name" name="last_name">
+
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email">
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password">
+
+    <button name="submitButton" id="submitButton">Submit</button>
+</form>
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"
+integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script src="/public/js/form_validate.js"></script>

@@ -10,7 +10,8 @@ router.get('/search', async (req, res) => {
     return res.render("search", {
         layout: 'home',
         css: 'search',
-        title: 'Search'
+        title: 'Search',
+        loggedIn: req.session.user ? true : false
     });
 });
 
@@ -18,7 +19,8 @@ router.get('/notifications', async (req, res) => {
     return res.render("notifications", {
         layout: 'home',
         css: 'notifications',
-        title: 'Notifications'
+        title: 'Notifications',
+        loggedIn: req.session.user ? true : false
     });
 });
 
@@ -33,13 +35,15 @@ router.route('/savedStreets')
                 layout: 'home',
                 css: 'savedStreets',
                 title: 'Saved Streets',
-                savedStreets
+                savedStreets,
+                loggedIn: req.session.user ? true : false
             });
         } catch (e) {
             return res.status(500).render("error", {
                 layout: 'home',
                 title: "Error",
-                error: e
+                error: e,
+                loggedIn: req.session.user ? true : false
             });
         }
     })
@@ -54,7 +58,8 @@ router.route('/savedStreets')
             return res.status(400).render("error", {
                 layout: 'home',
                 title: "Error",
-                error: e
+                error: e,
+                loggedIn: req.session.user ? true : false
             });
         }
 
@@ -64,17 +69,18 @@ router.route('/savedStreets')
             return res.status(404).render("error", {
                 layout: 'home',
                 title: "Error",
-                error: e
+                error: e,
+                loggedIn: req.session.user ? true : false
             });
         }
-        
     });
 
 router.get('/nearbyClosures', async (req, res) => {
     return res.render("nearbyClosures", {
         layout: 'home',
         css: 'nearbyClosures',
-        title: 'Nearby Closures'
+        title: 'Nearby Closures',
+        loggedIn: req.session.user ? true : false
     });
 });
 
@@ -82,7 +88,8 @@ router.get('/reportClosure', async (req, res) => {
     return res.render("reportClosure", {
         layout: 'home',
         css: 'reportClosure',
-        title: 'Report Closure'
+        title: 'Report Closure',
+        loggedIn: req.session.user ? true : false
     });
 });
 
