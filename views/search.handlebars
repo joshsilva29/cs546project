@@ -1,26 +1,19 @@
-<head>
-    <meta charset="utf-8">
-    <title>Search</title>
-    <link rel="stylesheet" href="../public/css/search.css">
-</head>
-<body>
-    <form id="search_form">
-        <label for="search_input">
-            Type in street name
-        </label>
-        <input type="text" name="search_input" id="search_input">
-        <button type="submit">Submit</button>
-    </form>
-    <div id="search-options">
-        <button onclick="toggleOption('all')" id="all">All</button>
-        <button onclick="toggleOption('user-reported')" id="user-reported">User-Reported</button>
-        <button onclick="toggleOption('nyc')" id="nyc">NYC Open Data</button>
-    </div>
-    <h3>Closures</h3>
+<form id="search_form">
+    <label for="search_input">
+        Type in street name
+    </label>
+    <input type="text" name="search_input" id="search_input">
+    <button type="submit">Submit</button>
+</form>
+<div id="search-options">
+    <button onclick="toggleOption('all')" id="all">All</button>
+    <button onclick="toggleOption('user-reported')" id="user-reported">User-Reported</button>
+    <button onclick="toggleOption('nyc')" id="nyc">NYC Open Data</button>
+</div>
+<h3>Closures</h3>
 
-    <div id="results"></div>
+<div id="results"></div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.js"
-    integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
-    <script src="../public/js/search.js"></script>
-</body>
+<script src="https://code.jquery.com/jquery-3.5.1.js"
+integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script src="../public/js/search.js"></script>
