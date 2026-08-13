@@ -31,7 +31,7 @@ button {
 #search-container {
     display: flex;
     flex-direction: column;
-    height: 85vh; //no overflow for search results
+    height: 85vh;
 }
 
 #search_form {

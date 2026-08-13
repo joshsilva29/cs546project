@@ -1,3 +1,18 @@
+function formatDate(dateString) {
+  const date = new Date(dateString);
+
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+} 
+
+function isDatePast(dateString) {
+  const date = new Date(dateString);
+  return date < new Date();
+}
+
 function getUserLocation() {
   if (!navigator.geolocation) {
     console.error("Geolocation is not supported by your browser.");
@@ -16,17 +31,29 @@ function getUserLocation() {
 
 async function successCallback(position) {
   
-
   let latitude = position.coords.latitude;
   let longitude = position.coords.longitude;
   const accuracy = position.coords.accuracy; 
 
   const elements = [];
 
-  const nearbyUserClosures = await nearByClosureSearch(latitude, longitude);
-  // const nearbyNYCClosures = await nearByNYCClosureSearch(latitude, longitude);
+  let nearbyUserClosures, nearbyNYCClosures = [];
+  try {
+    nearbyUserClosures = await nearByClosureSearch(latitude, longitude);
+  } catch (e) {
+    alert("There was an error fetching nearby closures");
+    console.log(e);
+  }
+  
+  try {
+    nearbyNYCClosures = await nearByNYCClosureSearch(latitude, longitude);
+  } catch (e) {
+    alert("There was an error fetching nearby NYC database closures");
+    console.log(e);
+  }
+   
   elements.push(nearbyUserClosures);
-  // elements.push(nearbyNYCClosures)
+  elements.push(nearbyNYCClosures)
 
 
   $("#results").empty(); //remove loading
@@ -37,22 +64,17 @@ async function successCallback(position) {
 
 // search from mongodb database
 async function nearByClosureSearch(latitude, longitude) {
-  let response, closureResults;
 
-  try {
-    const response = await fetch(`/closures/nearYou?latitude=${latitude}&longitude=${longitude}&maxDistanceMiles=10`);
-  } catch (e) {
-    alert("There was an error fetching nearby closures");
-  }
+  const response = await fetch(`/closures/nearYou?latitude=${latitude}&longitude=${longitude}&maxDistanceMiles=10`);
 
   const closureResults = await response.json();
 
   let elements = [];
 
   if (closureResults.length === 0) {
-    let noResultsElement = `<div>No user closures were found for ${street}</div>`;
+    let noResultsElement = `<div>No nearby closures were found</div>`;
     elements.push(noResultsElement);
-    // $("#results").append(noResultsElement);
+
   } else {
     for (let closure of closureResults) {
       let id = closure._id;
@@ -74,34 +96,25 @@ async function nearByClosureSearch(latitude, longitude) {
 
 // from NYC data
 async function nearByNYCClosureSearch(latitude, longitude) {
-  let response, closureResults;
-
-  try {
-    const response = await fetch(`/closures/nearYou?latitude=${latitude}&longitude=${longitude}&maxDistanceMiles=10`); // change fetch request to use nyc version once merged
-  } catch (e) {
-    alert("There was an error fetching nearby closures");
-  }
+  const response = await fetch(`/closureNearYou?lat=${latitude}&lon=${longitude}`); 
 
   const closureResults = await response.json();
 
   let elements = [];
 
-  if (closureResults.length === 0) {
-    let noResultsElement = `<div>No user closures were found for ${street}</div>`;
-    elements.push(noResultsElement);
-    // $("#results").append(noResultsElement);
-  } else {
-    for (let closure of closureResults) {
-      let id = closure._id;
-      let onStreet = closure.on_street_name;
-      let fromStreet = closure.from_street_name;
-      let toStreet = closure.to_street_name;
+  if (closureResults.results) {
+    for (let closure of closureResults.results) {
+      console.log(closure);
+      let onStreet = closure.street;
+      let crossStreet = closure.crossStreet || "";
+      let end = formatDate(closure.endDate);
       let closureElement = `
-          <div id=${id} class="closure-element">
-              <p>${onStreet}</p>
-              <p>From ${fromStreet} to ${toStreet}</p>
-          </div>
-      `;
+                <div class="closure-element">
+                    <p>${onStreet}</p>
+                    <p>Cross Street: ${crossStreet}</p>
+                    <p>${isDatePast(end) ? 'Ended:' : 'Ending'}: ${end}</p>
+                </div>
+            `;
       elements.push(closureElement);
     }
   }

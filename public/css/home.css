@@ -62,7 +62,7 @@ a:hover {
   width: 260px;
   background: var(--primary-color);
   color: white;
-  height: 100vh;
+  min-height: 100vh;
   transition: width 0.3s ease;
   overflow: hidden;
   position: relative;
