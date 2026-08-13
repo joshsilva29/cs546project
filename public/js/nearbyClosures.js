@@ -14,14 +14,99 @@ function getUserLocation() {
 }
 
 
-function successCallback(position) {
-  const latitude = position.coords.latitude;
-  const longitude = position.coords.longitude;
+async function successCallback(position) {
+  
+
+  let latitude = position.coords.latitude;
+  let longitude = position.coords.longitude;
   const accuracy = position.coords.accuracy; 
 
-  console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-  console.log(`Accurate within ${accuracy} meters.`);
+  const elements = [];
 
+  const nearbyUserClosures = await nearByClosureSearch(latitude, longitude);
+  // const nearbyNYCClosures = await nearByNYCClosureSearch(latitude, longitude);
+  elements.push(nearbyUserClosures);
+  // elements.push(nearbyNYCClosures)
+
+
+  $("#results").empty(); //remove loading
+  for (let element of elements) {
+    $("#results").append(element);
+  }
+}
+
+// search from mongodb database
+async function nearByClosureSearch(latitude, longitude) {
+  let response, closureResults;
+
+  try {
+    const response = await fetch(`/closures/nearYou?latitude=${latitude}&longitude=${longitude}&maxDistanceMiles=10`);
+  } catch (e) {
+    alert("There was an error fetching nearby closures");
+  }
+
+  const closureResults = await response.json();
+
+  let elements = [];
+
+  if (closureResults.length === 0) {
+    let noResultsElement = `<div>No user closures were found for ${street}</div>`;
+    elements.push(noResultsElement);
+    // $("#results").append(noResultsElement);
+  } else {
+    for (let closure of closureResults) {
+      let id = closure._id;
+      let onStreet = closure.on_street_name;
+      let fromStreet = closure.from_street_name;
+      let toStreet = closure.to_street_name;
+      let closureElement = `
+          <div id=${id} class="closure-element">
+              <p>${onStreet}</p>
+              <p>From ${fromStreet} to ${toStreet}</p>
+          </div>
+      `;
+      elements.push(closureElement);
+    }
+  }
+
+  return elements;
+}
+
+// from NYC data
+async function nearByNYCClosureSearch(latitude, longitude) {
+  let response, closureResults;
+
+  try {
+    const response = await fetch(`/closures/nearYou?latitude=${latitude}&longitude=${longitude}&maxDistanceMiles=10`); // change fetch request to use nyc version once merged
+  } catch (e) {
+    alert("There was an error fetching nearby closures");
+  }
+
+  const closureResults = await response.json();
+
+  let elements = [];
+
+  if (closureResults.length === 0) {
+    let noResultsElement = `<div>No user closures were found for ${street}</div>`;
+    elements.push(noResultsElement);
+    // $("#results").append(noResultsElement);
+  } else {
+    for (let closure of closureResults) {
+      let id = closure._id;
+      let onStreet = closure.on_street_name;
+      let fromStreet = closure.from_street_name;
+      let toStreet = closure.to_street_name;
+      let closureElement = `
+          <div id=${id} class="closure-element">
+              <p>${onStreet}</p>
+              <p>From ${fromStreet} to ${toStreet}</p>
+          </div>
+      `;
+      elements.push(closureElement);
+    }
+  }
+
+  return elements;
 }
 
 function errorCallback(error) {
@@ -40,5 +125,10 @@ function errorCallback(error) {
       break;
   }
 }
+
+let loading = "<div>Loading...</div>";
+
+$("#results").empty();
+$("#results").append(loading);
 
 getUserLocation();
