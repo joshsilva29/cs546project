@@ -6,6 +6,7 @@ import historyRoutes        from "./closureHistory.js";
 import nearYouRoutes        from "./closureNearYou.js";
 import searchRoutes         from "./closureSearch.js";
 import navigationRoutes     from "./navigation.js";
+import closureByOft from "./closureByOft.js"
 import { Timestamp } from "mongodb";
 
 const configureRoutes = (app) => {
@@ -17,6 +18,7 @@ const configureRoutes = (app) => {
     app.use(historyRoutes);
     app.use(nearYouRoutes);
     app.use(searchRoutes);
+    app.use(closureByOft);
 
     app.use('/{*splat}', (req, res) => {
         return res.status(404).render('error', {
