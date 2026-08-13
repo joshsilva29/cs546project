@@ -16,16 +16,22 @@ $("#search_form").submit(async (event) => {
 
     if (searchOption === "all" || searchOption === "user-reported") {
         let userReportedClosures = await closureSearch(street);
-        elements.push(userReportedClosures);
+        elements.push(...userReportedClosures);
     }
 
     if (searchOption === "all" || searchOption === "nyc") {
         let nycClosures = await nycClosureSearch(street);
-        elements.push(nycClosures);
+        elements.push(...nycClosures);
     }
+
+    let noResultsElement = `<div>No closures were found for "${street}"</div>`;
+    if (elements.length === 0) elements.push(noResultsElement);
+    console.log(elements.length);
+    console.log(elements[0]);
 
     $("#results").empty(); //remove loading
     for (let element of elements) {
+        console.log(element);
         $("#results").append(element);
     }
 
@@ -51,11 +57,7 @@ async function closureSearch(street) {
     // console.log(closureResults);
     let elements = [];
 
-    if (closureResults.length === 0) {
-        let noResultsElement = `<div>No user closures were found for ${street}</div>`;
-        elements.push(noResultsElement);
-        // $("#results").append(noResultsElement);
-    } else {
+    if (closureResults.length !== 0) {
         for(let closure of closureResults) {
             let id = closure._id;
             let onStreet = closure.on_street_name;
@@ -103,8 +105,8 @@ async function nycClosureSearch(street) {
             elements.push(closureElement);
         }
     } catch (e) {
-        let noResultsElement = `<div>No NYC closures were found for ${street}</div>`;
-        elements.push(noResultsElement);
+        // let noResultsElement = `<div>No NYC closures were found for ${street}</div>`;
+        // elements.push(noResultsElement);
     }
 
     return elements;
