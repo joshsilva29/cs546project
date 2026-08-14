@@ -26,10 +26,10 @@ router.get('/notifications', async (req, res) => {
 
 router.route('/savedStreets')
     .get(async (req, res) => {
-        let savedStreets;
+        let savedStreets, id;
 
         try {
-            const id = 'EXAMPLE_ID'; // get id from log in user
+            id = helpers.checkId(req.session.user._id); // get id from logged in user
             savedStreets = await users.getUserPlaces(id);
             return res.render("savedStreets", {
                 layout: 'home',
@@ -48,12 +48,33 @@ router.route('/savedStreets')
         }
     })
     .post(async (req, res) => {
-        let street; 
-        let id;
+        let street, id;
+
         try {
-            id = helpers.checkId('EXAMPLE_ID'); // get id from logged in user
+            id = helpers.checkId(req.session.user._id); // get id from logged in user
             const reqBody = req.body;
-            street = helpers.checkStreet(reqBody.street);
+            street = helpers.checkStreet(reqBody.save_street_input);
+        } catch (e) {
+            return res.status(400).render("error", {
+                layout: 'home',
+                title: "Error",
+                error: e,
+                loggedIn: req.session.user ? true : false
+            });
+        }
+
+        try {
+            const savedStreets = await users.getUserPlaces(id);
+            if (savedStreets.includes(street)) {
+                return res.render("savedStreets", {
+                    layout: 'home',
+                    css: 'savedStreets',
+                    title: 'Saved Streets',
+                    loggedIn: req.session.user ? true : false,
+                    savedStreets,
+                    error: 'You already have this street saved'
+                });
+            }
         } catch (e) {
             return res.status(400).render("error", {
                 layout: 'home',
@@ -65,6 +86,14 @@ router.route('/savedStreets')
 
         try {
             await users.addUserPlace(id, street);
+            const savedStreets = await users.getUserPlaces(id);
+            return res.render("savedStreets", {
+                layout: 'home',
+                css: 'savedStreets',
+                title: 'Saved Streets',
+                loggedIn: req.session.user ? true : false,
+                savedStreets
+            });
         } catch (e) {
             return res.status(404).render("error", {
                 layout: 'home',
