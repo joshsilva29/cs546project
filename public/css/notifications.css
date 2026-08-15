@@ -1,9 +1,48 @@
-.notification {
+﻿.notification {
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.notification.unread {
+  background: #eef3f8;
+  font-weight: 600;
 }
 
 .notification-image {
   width: 30px;
+}
+
+.notification-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.notification-date {
+  font-size: 0.8rem;
+  color: #666;
+  font-weight: 400;
+}
+
+.mark-read-button {
+  margin-left: auto;
+  cursor: pointer;
+}
+
+#mark_all_read {
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.notification-badge {
+  background: #b00020;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  padding: 1px 7px;
+  margin-left: 6px;
 }

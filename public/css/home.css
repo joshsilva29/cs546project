@@ -139,3 +139,12 @@ a:hover {
   fill: rgb(72, 72, 72);
   width: 33px;
 }
+/* unread notifications badge in the sidebar (shown on every page) */
+.notification-badge {
+  background: #b00020;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  padding: 1px 7px;
+  margin-left: 6px;
+}

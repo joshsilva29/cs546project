@@ -1,7 +1,34 @@
-<h1>Notifications</h1>
+﻿<h1>Notifications</h1>
+
+{{#if hasNotifications}}
+
+<button id="mark_all_read">Mark all as read</button>
+
 <div class="notification-list">
-  <a class="notification" href="/closure/:someid">
-    <img class="notification-image" src="/public/images/notification.png">
-    Example Notification
-  </a>
+  {{#each notifications}}
+  <div class="notification {{#unless read}}unread{{/unless}}">
+    <img class="notification-image" src="/public/images/notification.png" alt="">
+    <div class="notification-body">
+      <a href="/closures/{{closure_id}}">{{message}}</a>
+      <span class="notification-date">{{created_at}}</span>
+    </div>
+    {{#unless read}}
+    <button class="mark-read-button" data-id="{{_id}}">Mark read</button>
+    {{/unless}}
+  </div>
+  {{/each}}
 </div>
+
+{{else}}
+
+<p id="no-notifications">
+  No notifications yet. Save streets you care about on the
+  <a href="/savedStreets">Saved Streets</a> page and you'll be notified when
+  closures are reported on them.
+</p>
+
+{{/if}}
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"
+integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script src="/public/js/notifications.js"></script>

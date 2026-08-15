@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { closuresData } from '../data/index.js';
+import { closuresData, notificationsData } from '../data/index.js';
 const router = Router();
 
 //get duration of closure
@@ -122,6 +122,9 @@ router.post('/:id/corroborate', async (req, res) => {
     const { userId } = req.body;
     if (!userId) throw 'Error: userId is required in the request body.';
     const updated = await closuresData.corroborateClosure(req.params.id, userId);
+    // best-effort: tell the original reporter their closure was confirmed
+    try { await notificationsData.notifyClosureCorroborated(updated, userId); }
+    catch (err) { console.error('[corroborate] notification failed:', err); }
     return res.json(updated);
   } catch (e) {
     return res.status(400).json({ error: e });
@@ -148,6 +151,9 @@ router.patch('/:id/endDate', async (req, res) => {
     const { work_end_date } = req.body;
     if (!work_end_date) throw 'Error: work_end_date is required in the request body.';
     const updated = await closuresData.setClosureEndDate(req.params.id, work_end_date);
+    // best-effort: tell users who saved this street that an end date was set
+    try { await notificationsData.notifyClosureEnded(updated); }
+    catch (err) { console.error('[endDate] notification failed:', err); }
     return res.json(updated);
   } catch (e) {
     return res.status(400).json({ error: e });
@@ -158,6 +164,9 @@ router.patch('/:id/endDate', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const deleted = await closuresData.removeClosure(req.params.id);
+    // clean up notifications that point at the deleted closure (no dead links)
+    try { await notificationsData.removeNotificationsForClosure(req.params.id); }
+    catch (err) { console.error('[delete closure] notification cleanup failed:', err); }
     return res.json(deleted);
   } catch (e) {
     return res.status(400).json({ error: e });

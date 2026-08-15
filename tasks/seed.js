@@ -2,7 +2,7 @@
 // Wipes the CS546-Project database and repopulates it with sample users and closures via the data layer
 
 import { dbConnection, closeConnection } from '../config/mongoConnection.js';
-import { usersData, closuresData } from '../data/index.js';
+import { usersData, closuresData, notificationsData } from '../data/index.js';
 
 const db = await dbConnection();
 
@@ -10,6 +10,7 @@ await db.dropDatabase();
 
 await usersData.ensureUserIndexes();
 await closuresData.ensureClosureIndexes();
+await notificationsData.ensureNotificationIndexes();
 
 // USERS
 
@@ -137,6 +138,32 @@ console.log('Seeded comments.');
 //   'getAllClosures() count:',
 //   (await closuresData.getAllClosures()).length
 // );
+
+// NOTIFICATIONS
+
+await notificationsData.createNotification(
+  john._id.toString(),
+  'saved_street_closure',
+  userClosure3._id.toString(),
+  'New closure reported on 34th (from 5th to 6th).',
+  '34 st'
+);
+await notificationsData.createNotification(
+  jane._id.toString(),
+  'saved_street_closure',
+  userClosure3._id.toString(),
+  'New closure reported on 34th (from 5th to 6th).',
+  '5 av'
+);
+await notificationsData.createNotification(
+  john._id.toString(),
+  'corroboration',
+  userClosure1._id.toString(),
+  'Another user confirmed your reported closure on 4th.',
+  null
+);
+
+console.log('Seeded 3 notifications.');
 
 console.log('-------------')
 console.log('Done seeding.');
