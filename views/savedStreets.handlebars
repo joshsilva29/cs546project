@@ -1,2 +1,31 @@
 
 <h1>Saved Streets</h1>
+
+<form id="save_street_form" action="/savedStreets" method="POST">
+
+  <label for="save_street_input">Street Name</label>
+  <input type="text" name="save_street_input" id="save_street_input">
+
+  <input type="submit" value="Save">
+
+</form>
+
+<div id="error">{{error}}</div>
+
+<h2>Your Saved Streets</h2>
+{{#if savedStreets}}
+<ul>
+  {{#each savedStreets}}
+  <li>
+    <div class="saved-street">
+      {{this}}
+    </div>
+  </li>
+  {{/each}}
+</ul>
+{{/if}}
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"
+integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+
+<script src="/public/js/savedStreets.js"></script>

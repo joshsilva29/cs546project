@@ -1,4 +1,6 @@
 import { Router } from 'express';
+import * as users from '../data/users.js'; 
+import * as helpers from '../helpers.js';
 
 const router = Router();
 
@@ -22,14 +24,85 @@ router.get('/notifications', async (req, res) => {
     });
 });
 
-router.get('/savedStreets', async (req, res) => {
-    return res.render("savedStreets", {
-        layout: 'home',
-        css: 'savedStreets',
-        title: 'Saved Streets',
-        loggedIn: req.session.user ? true : false
+router.route('/savedStreets')
+    .get(async (req, res) => {
+        let savedStreets, id;
+
+        try {
+            id = helpers.checkId(req.session.user._id); // get id from logged in user
+            savedStreets = await users.getUserPlaces(id);
+            return res.render("savedStreets", {
+                layout: 'home',
+                css: 'savedStreets',
+                title: 'Saved Streets',
+                savedStreets,
+                loggedIn: req.session.user ? true : false
+            });
+        } catch (e) {
+            return res.status(500).render("error", {
+                layout: 'home',
+                title: "Error",
+                error: e,
+                loggedIn: req.session.user ? true : false
+            });
+        }
+    })
+    .post(async (req, res) => {
+        let street, id;
+
+        try {
+            id = helpers.checkId(req.session.user._id); // get id from logged in user
+            const reqBody = req.body;
+            street = helpers.checkStreet(reqBody.save_street_input);
+        } catch (e) {
+            return res.status(400).render("error", {
+                layout: 'home',
+                title: "Error",
+                error: e,
+                loggedIn: req.session.user ? true : false
+            });
+        }
+
+        try {
+            const savedStreets = await users.getUserPlaces(id);
+            if (savedStreets.includes(street)) {
+                return res.render("savedStreets", {
+                    layout: 'home',
+                    css: 'savedStreets',
+                    title: 'Saved Streets',
+                    loggedIn: req.session.user ? true : false,
+                    savedStreets,
+                    error: 'You already have this street saved'
+                });
+            }
+        } catch (e) {
+            return res.status(400).render("error", {
+                layout: 'home',
+                title: "Error",
+                error: e,
+                loggedIn: req.session.user ? true : false
+            });
+        }
+
+        try {
+            await users.addUserPlace(id, street);
+            const savedStreets = await users.getUserPlaces(id);
+            return res.render("savedStreets", {
+                layout: 'home',
+                css: 'savedStreets',
+                title: 'Saved Streets',
+                loggedIn: req.session.user ? true : false,
+                savedStreets
+            });
+        } catch (e) {
+            return res.status(404).render("error", {
+                layout: 'home',
+                title: "Error",
+                error: e,
+                loggedIn: req.session.user ? true : false
+            });
+        }
     });
-});
 
 router.get('/nearbyClosures', async (req, res) => {
     return res.render("nearbyClosures", {
