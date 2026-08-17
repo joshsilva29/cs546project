@@ -50,4 +50,43 @@ router.get('/reportClosure', async (req, res) => {
     });
 });
 
+router.get('/userReportedClosures', async (req, res) => {
+    return res.render("userReportedClosures", {
+        layout: 'home',
+        css: 'userReportedClosures',
+        title: 'User-Reported Closures',
+        loggedIn: req.session.user ? true : false
+    });
+});
+
+router.get('/nycClosures', async (req, res) => {
+    return res.render("nycClosures", {
+        layout: 'home',
+        css: 'nycClosures',
+        title: 'NYC Open Data Closures',
+        loggedIn: req.session.user ? true : false
+    });
+});
+
+router.get('/closureDetail/:id', async (req, res) => {
+    return res.render("closureDetail", {
+        layout: 'home',
+        css: 'closureDetail',
+        title: 'Closure Details',
+        loggedIn: req.session.user ? true : false,
+        userId: req.session.user ? req.session.user._id : null,
+        closureId: req.params.id
+    });
+});
+
+router.get('/nycClosureDetail/:oftcode', async (req, res) => {
+    return res.render("nycClosureDetail", {
+        layout: 'home',
+        css: 'nycClosureDetail',
+        title: 'Closure Details',
+        loggedIn: req.session.user ? true : false,
+        oftcode: req.params.oftcode
+    });
+});
+
 export default router;
