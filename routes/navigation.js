@@ -118,8 +118,7 @@ router.get('/reportClosure', async (req, res) => {
         layout: 'home',
         css: 'reportClosure',
         title: 'Report Closure',
-        loggedIn: req.session.user ? true : false,
-        userId: req.session.user ? req.session.user._id : null
+        loggedIn: req.session.user ? true : false
     });
 });
 
