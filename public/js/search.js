@@ -91,8 +91,16 @@ async function nycClosureSearch(street) {
 
     try {
         closureResults = await response.json();
-        console.log(closureResults);
+        let seen = new Set();
         for(let closure of closureResults.results) {
+
+            let oftCode = closure.oftcode; //since query returns closures with duplicate oftcodes
+            if (seen.has(oftCode)) {
+                continue;
+            } else {
+                seen.add(oftCode);
+            }
+
             let onStreet = closure.street;
             let toStreet = closure.toStreet || "";
             let fromStreet = toStreet ? `${closure.fromStreet} to` : closure.fromStreet;

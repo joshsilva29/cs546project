@@ -45,6 +45,15 @@ app.use("/reportClosure", (req, res, next) => {
      }
 });
 
+app.use("/nearbyClosures", (req, res, next) => {
+   let method = req.method;
+   if (!req.session.user && method === "GET") {
+      return res.redirect("/users/login");
+   } else {
+      next();
+   }
+});
+
 
 app.engine('handlebars', exphbs.engine({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
