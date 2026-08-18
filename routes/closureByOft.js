@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { nycFetch } from '../nycApi.js';
+import xss from 'xss';
 
 const router = Router();
 
@@ -12,7 +13,9 @@ router.get('/getClosure/:oftcode', async (req, res) => {
     return res.status(400).json({ error: 'Path param "oftcode" is required' });
   }
 
-  const where = `oftcode='${oftcode.replace(/'/g, "''")}'`;
+  const cleanOftcode = xss(oftcode);
+
+  const where = `oftcode='${cleanOftcode.replace(/'/g, "''")}'`;
 
   try {
     const data = await nycFetch({
@@ -21,7 +24,7 @@ router.get('/getClosure/:oftcode', async (req, res) => {
     });
 
     if (!data.length) {
-      return res.status(404).json({ message: `No closure found for oftcode: ${oftcode}` });
+      return res.status(404).json({ message: `No closure found for oftcode: ${cleanOftcode}` });
     }
 
     const row = data[0];

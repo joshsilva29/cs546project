@@ -1,0 +1,26 @@
+<h1>Closure Details</h1>
+
+<div id="closure-container">
+    <div id="closure-details">Loading...</div>
+
+    <button id="corroborate-btn" style="display:none;">Confirm this is still closed</button>
+    <p id="corroborate-message"></p>
+
+    <h3>Comments</h3>
+    <div id="comments-list"></div>
+
+    <form id="comment-form" style="display:none;">
+        <label for="comment_text">Add a comment</label>
+        <textarea id="comment_text" name="comment_text" rows="3"></textarea>
+        <button type="submit">Post Comment</button>
+    </form>
+    <p id="comment-error"></p>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"
+integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script>
+    const closureId = "{{closureId}}";
+    const currentUserId = {{#if userId}}"{{userId}}"{{else}}null{{/if}};
+</script>
+<script src="/public/js/closureDetail.js"></script>

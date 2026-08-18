@@ -64,10 +64,10 @@ async function closureSearch(street) {
             let fromStreet = closure.from_street_name;
             let toStreet = closure.to_street_name;
             let closureElement = `
-                <div id=${id} class="closure-element">
+                <a href="/closureDetail/${id}" class="closure-element">
                     <p>${onStreet}</p>
                     <p>From ${fromStreet} to ${toStreet}</p>
-                </div>
+                </a>
             `;
             elements.push(closureElement);
         }
@@ -105,10 +105,10 @@ async function nycClosureSearch(street) {
             let toStreet = closure.toStreet || "";
             let fromStreet = toStreet ? `${closure.fromStreet} to` : closure.fromStreet;
             let closureElement = `
-                <div class="closure-element">
+                <a href="/nycClosureDetail/${encodeURIComponent(closure.oftcode)}" class="closure-element">
                     <p>${onStreet}</p>
                     <p>From ${fromStreet} ${toStreet}</p>
-                </div>
+                </a>
             `;
             elements.push(closureElement);
         }
