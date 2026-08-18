@@ -54,6 +54,7 @@ router.get('/closureHistory', async (req, res) => {
         toStreet:    row.tostreetname   || null,
         borough:     row.boroughname    || null,
         workType:    row.purpose        || null,
+        oftcode:     row.oftcode        || null,
         startDate:   row.workstartdate  || null,
         endDate:     row.workenddate    || null,
         durationDays,
