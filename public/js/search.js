@@ -31,7 +31,7 @@ $("#search_form").submit(async (event) => {
             elements.push(...nycClosures);
         }
 
-        console.log(elements);
+        // console.log(elements);
 
         let noResultsElement = `<div>No closures were found for "${street}"</div>`;
         if (elements.length === 0) elements.push(noResultsElement);
@@ -51,14 +51,6 @@ $("#search_form").submit(async (event) => {
 
 //-----------------------------------------------------
 
-function errorFunction() {
-    $("#results").empty();
-    let element = `<div>There was an error searching for "${street}"</div>`;
-    $("#results").append(element);
-    $('#search_form').trigger('reset');
-    $('#search_input').focus();
-}
-
 async function closureSearch(street) {
     let response, closureResults;
 
@@ -68,13 +60,13 @@ async function closureSearch(street) {
         try {
             response = await fetch(`/closures/closureSearch?street=${street}`);
         } catch (e) {
-            errorFunction();
+            console.error(e);
         }
     } else {
         try {
             response = await fetch(`/closures/closureHistoryFiltered?street=${street}&status=${closureType}`);
         } catch (e) {
-            errorFunction();
+            console.error(e);
         }
     }
 
@@ -118,35 +110,37 @@ async function nycClosureSearch(street) {
         }
         response = await fetch(searchUrl);
     } catch (e) {
-        errorFunction();
+        console.error(e);
     }
 
     try {
         closureResults = await response.json();
-        let seen = new Set();
-        for(let closure of closureResults.results) {
+        if (closureResults && closureResults.results) {
+            let seen = new Set();
+            for(let closure of closureResults.results) {
 
-            let oftCode = closure.oftcode; //since query returns closures with duplicate oftcodes
-            if (seen.has(oftCode)) {
-                continue;
-            } else {
-                seen.add(oftCode);
+                let oftCode = closure.oftcode; //since query returns closures with duplicate oftcodes
+                if (seen.has(oftCode)) {
+                    continue;
+                } else {
+                    seen.add(oftCode);
+                }
+
+                let onStreet = closure.street;
+                let toStreet = closure.toStreet || "";
+                let fromStreet = toStreet ? `${closure.fromStreet} to` : closure.fromStreet;
+                let href = `/nycClosureDetail/${encodeURIComponent(closure.oftcode)}/${encodeURIComponent(closure.startDate.slice(0, -1))}/${encodeURIComponent(closure.endDate.slice(0, -1))}`;
+                let closureElement = `
+                    <a href=${href} class="closure-element">
+                        <p>${onStreet}</p>
+                        <p>From ${fromStreet} ${toStreet}</p>
+                    </a>
+                `;
+                elements.push(closureElement);
             }
-
-            let onStreet = closure.street;
-            let toStreet = closure.toStreet || "";
-            let fromStreet = toStreet ? `${closure.fromStreet} to` : closure.fromStreet;
-            let href = `/nycClosureDetail/${encodeURIComponent(closure.oftcode)}/${encodeURIComponent(closure.startDate.slice(0, -1))}/${encodeURIComponent(closure.endDate.slice(0, -1))}`;
-            let closureElement = `
-                <a href=${href} class="closure-element">
-                    <p>${onStreet}</p>
-                    <p>From ${fromStreet} ${toStreet}</p>
-                </a>
-            `;
-            elements.push(closureElement);
         }
     } catch (e) {
-        errorFunction();
+        console.error(e);
     }
 
     return elements;
@@ -169,7 +163,7 @@ function toggleOption(option) {
     }
     searchOption = option;
 
-    console.log(searchOption);
+    // console.log(searchOption);
 }
 
 function toggleClosureType(option) {
@@ -188,5 +182,5 @@ function toggleClosureType(option) {
     }
     closureType = option;
 
-    console.log(closureType);
+    // console.log(closureType);
 }
