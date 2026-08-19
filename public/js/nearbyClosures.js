@@ -107,7 +107,6 @@ async function nearByNYCClosureSearch(latitude, longitude) {
   if (closureResults.results) {
     let seen = new Set();
     for (let closure of closureResults.results) {
-      console.log(closure);
 
       let oftCode = closure.oftcode; //since query returns closures with duplicate oftcodes
       if (seen.has(oftCode)) {
