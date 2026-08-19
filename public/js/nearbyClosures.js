@@ -64,7 +64,7 @@ async function searchNearbyClosures() {
     if (nearbyUserClosures)
       elements.push(nearbyUserClosures);
   } catch (e) {
-    console.error(e);
+    // console.error(e);
   }
 
   try {
@@ -77,7 +77,7 @@ async function searchNearbyClosures() {
     if (nearbyNYCClosures)
       elements.push(nearbyNYCClosures);
   } catch (e) {
-    console.error(e);
+    // console.error(e);
   }
 
   $("#results").empty();
