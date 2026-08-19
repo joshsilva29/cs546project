@@ -6,37 +6,47 @@ $("#search_form").submit(async (event) => {
     event.preventDefault();
     
     let street = $("#search_input").val().trim();
-    if (!street) alert("You need to provide a street name");
 
-    let loading = "<div >Loading...</div>";
-
-    $("#results").empty();
-    $("#results").append(loading);
-
-    let elements = [];
-
-    if (searchOption === "all" || searchOption === "user-reported") {
-        let userReportedClosures = await closureSearch(street);
-        elements.push(...userReportedClosures);
-    }
-
-    if (searchOption === "all" || searchOption === "nyc") {
-        let nycClosures = await nycClosureSearch(street);
-        elements.push(...nycClosures);
-    }
-
-    let noResultsElement = `<div>No closures were found for "${street}"</div>`;
-    if (elements.length === 0) elements.push(noResultsElement);
-    // console.log(elements.length);
-    // console.log(elements[0]);
-
-    $("#results").empty(); //remove loading
-    for (let element of elements) {
+    if (!street) {
+        $("#results").empty();
+        let element = `<div>You must provide a street name.</div>`;
         $("#results").append(element);
+        $('#search_form').trigger('reset');
+        $('#search_input').focus();
+    } else {
+        let loading = "<div >Loading...</div>";
+
+        $("#results").empty();
+        $("#results").append(loading);
+
+        let elements = [];
+
+        if (searchOption === "all" || searchOption === "user-reported") {
+            let userReportedClosures = await closureSearch(street);
+            elements.push(...userReportedClosures);
+        }
+
+        if (searchOption === "all" || searchOption === "nyc") {
+            let nycClosures = await nycClosureSearch(street);
+            elements.push(...nycClosures);
+        }
+
+        console.log(elements);
+
+        let noResultsElement = `<div>No closures were found for "${street}"</div>`;
+        if (elements.length === 0) elements.push(noResultsElement);
+        // console.log(elements.length);
+        // console.log(elements[0]);
+
+        $("#results").empty(); //remove loading
+        for (let element of elements) {
+            $("#results").append(element);
+        }
+
+        $('#search_form').trigger('reset');
+        $('#search_input').focus();
     }
 
-    $('#search_form').trigger('reset');
-    $('#search_input').focus();
 });
 
 //-----------------------------------------------------
