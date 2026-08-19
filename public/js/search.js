@@ -1,42 +1,52 @@
 
 let searchOption = "all";
+let closureType = "all";
 
 $("#search_form").submit(async (event) => {
     event.preventDefault();
     
     let street = $("#search_input").val().trim();
-    if (!street) alert("You need to provide a street name");
 
-    let loading = "<div >Loading...</div>";
-
-    $("#results").empty();
-    $("#results").append(loading);
-
-    let elements = [];
-
-    if (searchOption === "all" || searchOption === "user-reported") {
-        let userReportedClosures = await closureSearch(street);
-        elements.push(...userReportedClosures);
-    }
-
-    if (searchOption === "all" || searchOption === "nyc") {
-        let nycClosures = await nycClosureSearch(street);
-        elements.push(...nycClosures);
-    }
-
-    let noResultsElement = `<div>No closures were found for "${street}"</div>`;
-    if (elements.length === 0) elements.push(noResultsElement);
-    console.log(elements.length);
-    console.log(elements[0]);
-
-    $("#results").empty(); //remove loading
-    for (let element of elements) {
-        console.log(element);
+    if (!street) {
+        $("#results").empty();
+        let element = `<div>You must provide a street name.</div>`;
         $("#results").append(element);
+        $('#search_form').trigger('reset');
+        $('#search_input').focus();
+    } else {
+        let loading = "<div >Loading...</div>";
+
+        $("#results").empty();
+        $("#results").append(loading);
+
+        let elements = [];
+
+        if (searchOption === "all" || searchOption === "user-reported") {
+            let userReportedClosures = await closureSearch(street);
+            elements.push(...userReportedClosures);
+        }
+
+        if (searchOption === "all" || searchOption === "nyc") {
+            let nycClosures = await nycClosureSearch(street);
+            elements.push(...nycClosures);
+        }
+
+        // console.log(elements);
+
+        let noResultsElement = `<div>No closures were found for "${street}"</div>`;
+        if (elements.length === 0) elements.push(noResultsElement);
+        // console.log(elements.length);
+        // console.log(elements[0]);
+
+        $("#results").empty(); //remove loading
+        for (let element of elements) {
+            $("#results").append(element);
+        }
+
+        $('#search_form').trigger('reset');
+        $('#search_input').focus();
     }
 
-    $('#search_form').trigger('reset');
-    $('#search_input').focus();
 });
 
 //-----------------------------------------------------
@@ -46,10 +56,18 @@ async function closureSearch(street) {
 
     //THIS IS FOR THE MONGODB CLOSURES DATABASE
 
-    try {
-        response = await fetch(`/closures/closureSearch?street=${street}`);
-    } catch (e) {
-        alert("There was an error fetching the results");
+    if (closureType === "all") {
+        try {
+            response = await fetch(`/closures/closureSearch?street=${street}`);
+        } catch (e) {
+            console.error(e);
+        }
+    } else {
+        try {
+            response = await fetch(`/closures/closureHistoryFiltered?street=${street}&status=${closureType}`);
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     closureResults = await response.json();
@@ -84,44 +102,52 @@ async function nycClosureSearch(street) {
     let elements = [];
 
     try {
-        response = await fetch(`/closureSearch?street=${street}`);
+        let searchUrl = `/closureSearch?street=${street}`;
+        if (closureType === "inactive") {
+            searchUrl = `/closureSearch?street=${street}&status=past`;
+        } else if (closureType === "active") {
+            searchUrl = `/closureSearch?street=${street}&status=active`;
+        }
+        response = await fetch(searchUrl);
     } catch (e) {
-        alert("There was an error fetching the results");
+        console.error(e);
     }
 
     try {
         closureResults = await response.json();
-        let seen = new Set();
-        for(let closure of closureResults.results) {
+        if (closureResults && closureResults.results) {
+            let seen = new Set();
+            for(let closure of closureResults.results) {
 
-            let oftCode = closure.oftcode; //since query returns closures with duplicate oftcodes
-            if (seen.has(oftCode)) {
-                continue;
-            } else {
-                seen.add(oftCode);
+                let oftCode = closure.oftcode; //since query returns closures with duplicate oftcodes
+                if (seen.has(oftCode)) {
+                    continue;
+                } else {
+                    seen.add(oftCode);
+                }
+
+                let onStreet = closure.street;
+                let toStreet = closure.toStreet || "";
+                let fromStreet = toStreet ? `${closure.fromStreet} to` : closure.fromStreet;
+                let href = `/nycClosureDetail/${encodeURIComponent(closure.oftcode)}/${encodeURIComponent(closure.startDate.slice(0, -1))}/${encodeURIComponent(closure.endDate.slice(0, -1))}`;
+                let closureElement = `
+                    <a href=${href} class="closure-element">
+                        <p>${onStreet}</p>
+                        <p>From ${fromStreet} ${toStreet}</p>
+                    </a>
+                `;
+                elements.push(closureElement);
             }
-
-            let onStreet = closure.street;
-            let toStreet = closure.toStreet || "";
-            let fromStreet = toStreet ? `${closure.fromStreet} to` : closure.fromStreet;
-            let closureElement = `
-                <a href="/nycClosureDetail/${encodeURIComponent(closure.oftcode)}" class="closure-element">
-                    <p>${onStreet}</p>
-                    <p>From ${fromStreet} ${toStreet}</p>
-                </a>
-            `;
-            elements.push(closureElement);
         }
     } catch (e) {
-        // let noResultsElement = `<div>No NYC closures were found for ${street}</div>`;
-        // elements.push(noResultsElement);
+        console.error(e);
     }
 
     return elements;
     
 }
 
-async function toggleOption(option) {
+function toggleOption(option) {
     if (option === "all") {
         $("#all").addClass("selected-class");
         $("#user-reported").removeClass("selected-class");
@@ -137,5 +163,24 @@ async function toggleOption(option) {
     }
     searchOption = option;
 
-    console.log(searchOption);
+    // console.log(searchOption);
+}
+
+function toggleClosureType(option) {
+    if (option === "all") {
+        $("#allClosures").addClass("selected-class");
+        $("#inactive").removeClass("selected-class");
+        $("#active").removeClass("selected-class");
+    } else if (option === "inactive") {
+        $("#allClosures").removeClass("selected-class");
+        $("#inactive").addClass("selected-class");
+        $("#active").removeClass("selected-class");
+    } else {
+        $("#allClosures").removeClass("selected-class");
+        $("#inactive").removeClass("selected-class");
+        $("#active").addClass("selected-class");
+    }
+    closureType = option;
+
+    // console.log(closureType);
 }

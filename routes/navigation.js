@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import * as users from '../data/users.js'; 
 import * as helpers from '../helpers.js';
+import xss from 'xss';
 
 const router = Router();
 
@@ -151,14 +152,32 @@ router.get('/closureDetail/:id', async (req, res) => {
     });
 });
 
-router.get('/nycClosureDetail/:oftcode', async (req, res) => {
-    return res.render("nycClosureDetail", {
-        layout: 'home',
-        css: 'nycClosureDetail',
-        title: 'Closure Details',
-        loggedIn: req.session.user ? true : false,
-        oftcode: req.params.oftcode
-    });
+router.get('/nycClosureDetail/:oftcode/:startDate/:endDate', async (req, res) => {
+        req.params.oftcode = xss(req.params.oftcode);
+        req.params.startDate = xss(req.params.startDate);
+        req.params.endDate = xss(req.params.endDate);
+
+        //check dates
+        try {
+            helpers.checkDate(decodeURIComponent(req.params.startDate), "Start date");
+            helpers.checkDate(decodeURIComponent(req.params.endDate), "End date");
+            return res.render("nycClosureDetail", {
+                layout: 'home',
+                css: 'nycClosureDetail',
+                title: 'Closure Details',
+                loggedIn: req.session.user ? true : false,
+                oftcode: req.params.oftcode,
+                startDate: req.params.startDate,
+                endDate: req.params.endDate
+            });
+        } catch (e) {
+            return res.status(400).render("error", {
+                layout: 'home',
+                title: "Error",
+                error: e,
+                loggedIn: req.session.user ? true : false
+            });
+        }
 });
 
 export default router;

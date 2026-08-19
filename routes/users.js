@@ -1,9 +1,10 @@
 import {Router} from 'express';
 import {usersData} from '../data/index.js';
 import * as helpers from "../helpers.js";
+import xss from 'xss';
 const router = Router();
 
-//josh (frontend integration) -- load register page for user
+//load register page for user
 router
   .route('/')
   .get(async (req, res) => {
@@ -47,10 +48,10 @@ router
     //actual data function call
     try {
       let {first_name, last_name, email, password} = req.body;
-      first_name = helpers.checkString(first_name, "First Name");
-      last_name = helpers.checkString(last_name, "Last Name");
-      email = helpers.checkEmail(email, "Email");
-      password = helpers.checkString(password, "Password");
+      first_name = xss(helpers.checkString(first_name, "First Name"));
+      last_name = xss(helpers.checkString(last_name, "Last Name"));
+      email = xss(helpers.checkEmail(email, "Email"));
+      password = xss(helpers.checkString(password, "Password"));
 
       const user = await usersData.createUser(first_name, last_name, email, password);
       return res.redirect("/users/login");
@@ -67,7 +68,7 @@ router
     }
   });
 
-//josh (frontend integration) -- login routes
+//login routes
 router
   .route('/login')
   .get(async (req, res) => {
@@ -104,8 +105,8 @@ router
     }
 
     try {
-        req.body.email = helpers.checkEmail(req.body.email, "Email");
-        req.body.password = helpers.checkString(req.body.password, "Password");
+        req.body.email = xss(helpers.checkEmail(req.body.email, "Email"));
+        req.body.password = xss(helpers.checkString(req.body.password, "Password"));
         let user = await usersData.authenticateUser(req.body.email, req.body.password);
         req.session.user = user;
         return res.redirect('/nearbyClosures');
@@ -123,7 +124,7 @@ router
   });
 
 
-//josh - logout
+//logout
 router.route('/logout').get(async (req, res) => {
   //code here for GET
   req.session.destroy();
@@ -133,6 +134,8 @@ router.route('/logout').get(async (req, res) => {
         title: 'Logout'
     });
 });
+
+// ---------
 
 router
   .route('/:id')
