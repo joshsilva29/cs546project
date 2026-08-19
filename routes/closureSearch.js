@@ -13,7 +13,7 @@ router.get('/closureSearch', async (req, res) => {
     return res.status(400).json({ error: 'Query param "street" is required' });
   }
  
-  const now   = new Date().toISOString();
+  const now   = new Date().toISOString().slice(0, -1); //remove the 'Z' at the end of the timestamp;
   const where = [
     `upper(onstreetname) like '%${street.toUpperCase().replace(/'/g, "''")}%'`
   ];

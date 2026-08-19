@@ -1,5 +1,6 @@
 
 let searchOption = "all";
+let closureType = "all";
 
 $("#search_form").submit(async (event) => {
     event.preventDefault();
@@ -26,12 +27,11 @@ $("#search_form").submit(async (event) => {
 
     let noResultsElement = `<div>No closures were found for "${street}"</div>`;
     if (elements.length === 0) elements.push(noResultsElement);
-    console.log(elements.length);
-    console.log(elements[0]);
+    // console.log(elements.length);
+    // console.log(elements[0]);
 
     $("#results").empty(); //remove loading
     for (let element of elements) {
-        console.log(element);
         $("#results").append(element);
     }
 
@@ -45,7 +45,6 @@ async function closureSearch(street) {
     let response, closureResults;
 
     //THIS IS FOR THE MONGODB CLOSURES DATABASE
-
     try {
         response = await fetch(`/closures/closureSearch?street=${street}`);
     } catch (e) {
@@ -84,7 +83,13 @@ async function nycClosureSearch(street) {
     let elements = [];
 
     try {
-        response = await fetch(`/closureSearch?street=${street}`);
+        let searchUrl = `/closureSearch?street=${street}`;
+        if (closureType === "inactive") {
+            searchUrl = `/closureSearch?street=${street}&status=past`;
+        } else if (closureType === "active") {
+            searchUrl = `/closureSearch?street=${street}&status=active`;
+        }
+        response = await fetch(searchUrl);
     } catch (e) {
         alert("There was an error fetching the results");
     }
@@ -104,8 +109,9 @@ async function nycClosureSearch(street) {
             let onStreet = closure.street;
             let toStreet = closure.toStreet || "";
             let fromStreet = toStreet ? `${closure.fromStreet} to` : closure.fromStreet;
+            let href = `/nycClosureDetail/${encodeURIComponent(closure.oftcode)}/${encodeURIComponent(closure.startDate.slice(0, -1))}/${encodeURIComponent(closure.endDate.slice(0, -1))}`;
             let closureElement = `
-                <a href="/nycClosureDetail/${encodeURIComponent(closure.oftcode)}" class="closure-element">
+                <a href=${href} class="closure-element">
                     <p>${onStreet}</p>
                     <p>From ${fromStreet} ${toStreet}</p>
                 </a>
@@ -121,7 +127,7 @@ async function nycClosureSearch(street) {
     
 }
 
-async function toggleOption(option) {
+function toggleOption(option) {
     if (option === "all") {
         $("#all").addClass("selected-class");
         $("#user-reported").removeClass("selected-class");
@@ -138,4 +144,23 @@ async function toggleOption(option) {
     searchOption = option;
 
     console.log(searchOption);
+}
+
+function toggleClosureType(option) {
+    if (option === "all") {
+        $("#allClosures").addClass("selected-class");
+        $("#inactive").removeClass("selected-class");
+        $("#active").removeClass("selected-class");
+    } else if (option === "inactive") {
+        $("#allClosures").removeClass("selected-class");
+        $("#inactive").addClass("selected-class");
+        $("#active").removeClass("selected-class");
+    } else {
+        $("#allClosures").removeClass("selected-class");
+        $("#inactive").removeClass("selected-class");
+        $("#active").addClass("selected-class");
+    }
+    closureType = option;
+
+    console.log(closureType);
 }

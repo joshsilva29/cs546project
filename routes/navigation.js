@@ -151,13 +151,15 @@ router.get('/closureDetail/:id', async (req, res) => {
     });
 });
 
-router.get('/nycClosureDetail/:oftcode', async (req, res) => {
+router.get('/nycClosureDetail/:oftcode/:startDate/:endDate', async (req, res) => {
     return res.render("nycClosureDetail", {
         layout: 'home',
         css: 'nycClosureDetail',
         title: 'Closure Details',
         loggedIn: req.session.user ? true : false,
-        oftcode: req.params.oftcode
+        oftcode: req.params.oftcode,
+        startDate: req.params.startDate,
+        endDate: req.params.endDate
     });
 });
 

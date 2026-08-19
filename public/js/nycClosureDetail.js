@@ -5,7 +5,7 @@ $(() => {
 async function loadClosure() {
     let data;
     try {
-        const response = await fetch(`/getClosure/${encodeURIComponent(oftcode)}`);
+        const response = await fetch(`/getClosure/${encodeURIComponent(oftcode)}/${encodeURIComponent(startDate)}/${encodeURIComponent(endDate)}`);
         data = await response.json();
         if (!response.ok) throw data.error || "Closure not found.";
     } catch (e) {

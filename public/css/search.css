@@ -40,7 +40,7 @@ button {
     gap: 1rem;
 }
 
-#search-options {
+.search-options {
     display: flex;
     gap: 1rem;
     margin-top: 0.6rem;
