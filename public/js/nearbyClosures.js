@@ -1,3 +1,6 @@
+let userLatitude;
+let userLongitude; 
+
 function formatDate(dateString) {
   const date = new Date(dateString);
 
@@ -30,44 +33,71 @@ function getUserLocation() {
 
 
 async function successCallback(position) {
-  
-  let latitude = position.coords.latitude;
-  let longitude = position.coords.longitude;
-  // let latitude = 40.7128; // new york city coords for testing
-  // let longitude = -74.0060;
-  const accuracy = position.coords.accuracy; 
+
+  userLatitude = position.coords.latitude;
+  userLongitude = position.coords.longitude;
+
+  await searchNearbyClosures();
+}
+
+async function searchNearbyClosures() {
+
+  const distance = Number($("#distance").val());
+
+  if (!distance || distance <= 0) {
+    alert("Please enter a valid distance.");
+    return;
+  }
+
+  $("#results").empty();
+  $("#results").append("<div>Loading...</div>");
 
   const elements = [];
 
-  let nearbyUserClosures, nearbyNYCClosures = [];
   try {
-    nearbyUserClosures = await nearByClosureSearch(latitude, longitude);
+    const nearbyUserClosures = await nearByClosureSearch(
+      userLatitude,
+      userLongitude,
+      distance
+    );
+
+    if (nearbyUserClosures)
+      elements.push(nearbyUserClosures);
   } catch (e) {
-    alert("There was an error fetching nearby closures");
-    console.log(e);
+    console.error(e);
   }
-  
+
   try {
-    nearbyNYCClosures = await nearByNYCClosureSearch(latitude, longitude);
+    const nearbyNYCClosures = await nearByNYCClosureSearch(
+      userLatitude,
+      userLongitude,
+      distance
+    );
+
+    if (nearbyNYCClosures)
+      elements.push(nearbyNYCClosures);
   } catch (e) {
-    alert("There was an error fetching nearby NYC database closures");
-    console.log(e);
+    console.error(e);
   }
-   
-  elements.push(nearbyUserClosures);
-  elements.push(nearbyNYCClosures)
 
+  $("#results").empty();
 
-  $("#results").empty(); //remove loading
   for (let element of elements) {
     $("#results").append(element);
   }
 }
 
 // search from mongodb database
-async function nearByClosureSearch(latitude, longitude) {
+async function nearByClosureSearch(latitude, longitude, distance) {
+  let response;
 
-  const response = await fetch(`/closures/nearYou?latitude=${latitude}&longitude=${longitude}&maxDistanceMiles=10`);
+  try {
+    response = await fetch(
+      `/closures/nearYou?latitude=${latitude}&longitude=${longitude}&maxDistanceMiles=${distance}`
+    );
+  } catch (e) {
+    return [];
+  }
 
   const closureResults = await response.json();
 
@@ -97,8 +127,15 @@ async function nearByClosureSearch(latitude, longitude) {
 }
 
 // from NYC data
-async function nearByNYCClosureSearch(latitude, longitude) {
-  const response = await fetch(`/closureNearYou?lat=${latitude}&lon=${longitude}`); 
+async function nearByNYCClosureSearch(latitude, longitude, distance) {
+  let response; 
+  try {
+    response = await fetch(
+      `/closureNearYou?lat=${latitude}&lon=${longitude}&miles=${distance}`
+    );
+  } catch (e) {
+    return [];
+  }
 
   const closureResults = await response.json();
 
@@ -148,9 +185,8 @@ function errorCallback(error) {
   }
 }
 
-let loading = "<div>Loading...</div>";
-
-$("#results").empty();
-$("#results").append(loading);
+$("#search-button").on("click", function () {
+  searchNearbyClosures();
+});
 
 getUserLocation();
