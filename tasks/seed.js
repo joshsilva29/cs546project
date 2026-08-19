@@ -299,6 +299,19 @@ const userClosure15 = await closuresData.createClosure(
   true
 );
 
+const userClosure16 = await closuresData.createClosure(
+  josh._id.toString(),
+  'Fulton St',
+  'Dutch St',
+  'William St',
+  '2025-05-28',
+  '2025-06-29',
+  {latitude: 40.709746, longitude: -74.006757},
+  true,
+  false,
+  true
+);
+
 
 console.log('Seeded user-reported closures.');
 
@@ -306,10 +319,10 @@ console.log('Seeded user-reported closures.');
 
 await closuresData.corroborateClosure(userClosure1._id.toString(), john._id.toString());
 await closuresData.corroborateClosure(userClosure1._id.toString(), alex._id.toString());
-await closuresData.corroborateClosure(userClosure1._id.toString(), john._id.toString());
+await closuresData.corroborateClosure(userClosure3._id.toString(), john._id.toString());
 await closuresData.corroborateClosure(userClosure12._id.toString(), josh._id.toString());
 await closuresData.corroborateClosure(userClosure12._id.toString(), carlos._id.toString());
-await closuresData.corroborateClosure(userClosure1._id.toString(), alex._id.toString());
+await closuresData.corroborateClosure(userClosure8._id.toString(), alex._id.toString());
 
 console.log('Seeded corroborations.');
 
