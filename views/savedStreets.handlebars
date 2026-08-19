@@ -3,12 +3,15 @@
 
 <form id="save_street_form" action="/savedStreets" method="POST">
 
-  <div class="form-field">
-    <label for="save_street_input">Street Name</label>
-    <input type="text" name="save_street_input" id="save_street_input">
-  </div>
+  <label for="save_street_input">Street Name:</label>
+  <input 
+    type="text" 
+    name="save_street_input" 
+    id="save_street_input"
+    placeholder="e.g. 4th St, Main St"
+  >
   
-  <input type="submit" value="Save">
+  <input type="submit" id="submit-button" value="Save">
 
 </form>
 

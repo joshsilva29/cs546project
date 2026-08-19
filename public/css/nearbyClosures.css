@@ -1,6 +1,8 @@
 .closure-element {
   border: 1px solid black;
+  width: 95%;
   padding-left: 1rem;
+  border-radius: 0.4rem;
 }
 
 .selected-class {
