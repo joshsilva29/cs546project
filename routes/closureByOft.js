@@ -6,16 +6,22 @@ const router = Router();
 
 // GET — get a specific closure by its oftcode
 // Usage: /getClosure/113610137310197530
-router.get('/getClosure/:oftcode', async (req, res) => {
-  const { oftcode } = req.params;
+router.get('/getClosure/:oftcode/:startDate/:endDate', async (req, res) => {
+  const { oftcode, startDate, endDate } = req.params;
 
   if (!oftcode) {
     return res.status(400).json({ error: 'Path param "oftcode" is required' });
   }
 
   const cleanOftcode = xss(oftcode);
+  const cleanStartDate = xss(startDate);
+  const cleanEndDate = xss(endDate);
 
-  const where = `oftcode='${cleanOftcode.replace(/'/g, "''")}'`;
+  const where = `
+    oftcode='${cleanOftcode.replace(/'/g, "''")}' AND 
+    workstartdate='${cleanStartDate}' AND 
+    workenddate='${cleanEndDate}'
+  `;
 
   try {
     const data = await nycFetch({
