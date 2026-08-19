@@ -64,6 +64,7 @@ router.get('/closureSearch', async (req, res) => {
   }
 });
 
+//get active or inactive closures in or around a certain street (street sent as a query param)
 router.get('/closureHistoryFiltered', async (req, res) => {
   try {
     const { street, status } = req.query;
