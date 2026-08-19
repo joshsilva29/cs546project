@@ -41,14 +41,31 @@ $("#search_form").submit(async (event) => {
 
 //-----------------------------------------------------
 
+function errorFunction() {
+    $("#results").empty();
+    let element = `<div>There was an error searching for "${street}"</div>`;
+    $("#results").append(element);
+    $('#search_form').trigger('reset');
+    $('#search_input').focus();
+}
+
 async function closureSearch(street) {
     let response, closureResults;
 
     //THIS IS FOR THE MONGODB CLOSURES DATABASE
-    try {
-        response = await fetch(`/closures/closureSearch?street=${street}`);
-    } catch (e) {
-        alert("There was an error fetching the results");
+
+    if (closureType === "all") {
+        try {
+            response = await fetch(`/closures/closureSearch?street=${street}`);
+        } catch (e) {
+            errorFunction();
+        }
+    } else {
+        try {
+            response = await fetch(`/closures/closureHistoryFiltered?street=${street}&status=${closureType}`);
+        } catch (e) {
+            errorFunction();
+        }
     }
 
     closureResults = await response.json();
@@ -91,7 +108,7 @@ async function nycClosureSearch(street) {
         }
         response = await fetch(searchUrl);
     } catch (e) {
-        alert("There was an error fetching the results");
+        errorFunction();
     }
 
     try {
@@ -119,8 +136,7 @@ async function nycClosureSearch(street) {
             elements.push(closureElement);
         }
     } catch (e) {
-        // let noResultsElement = `<div>No NYC closures were found for ${street}</div>`;
-        // elements.push(noResultsElement);
+        errorFunction();
     }
 
     return elements;

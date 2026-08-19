@@ -64,6 +64,20 @@ router.get('/closureSearch', async (req, res) => {
   }
 });
 
+router.get('/closureHistoryFiltered', async (req, res) => {
+  try {
+    const { street, status } = req.query;
+    if (!street) throw 'Error: street is required as a query param.';
+    if (!status) throw 'Error: status is required as a query param.';
+    const cleanStreet = xss(street);
+    const cleanStatus = xss(status);
+    const results = await closuresData.getClosureHistoryFiltered(cleanStreet, cleanStatus);
+    return res.json(results);
+  } catch (e) {
+    return res.status(400).json({ error: e });
+  }
+});
+
 // ---------------------------------------------------------------------------------
 // Routes below this line weren't in the original file -- adding them so every
 // closures.js data function has something to hit over HTTP (for Bruno / the

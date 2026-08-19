@@ -124,6 +124,22 @@ export const getClosureHistory = async (street) => {
     .toArray();
 };
 
+//closures on a given street, either active or inactive
+export const getClosureHistoryFiltered = async (street, status) => {
+  street = helpers.checkString(street, "street");
+  status = helpers.checkString(status, "status");
+  if (status !== "active" && status !== "inactive") throw "status must be active or inactive";
+  let allClosures = await getClosureHistory(street);
+  let filteredClosures = allClosures.filter((closure) => {
+    if (status === "active") {
+      if (!closure.work_end_date) return closure;
+    } else {
+      if (closure.work_end_date) return closure;
+    }
+  });
+  return filteredClosures;
+}
+
 // Same underlying query as getClosureHistory, kept as a separate
 export const searchClosuresByStreet = async (street) => {
   return await getClosureHistory(street);
