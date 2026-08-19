@@ -68,9 +68,11 @@ function formatRow(row, originLat = null, originLon = null) {
  
   return {
     street:       row.onstreetname   || null,
-    crossStreet:  row.fromstreetname || null,
+    fromStreet: row.fromstreetname || null,
+    toStreet: row.tostreetname || null,
     borough:      BOROUGH_NAMES[row.borough_code] || row.borough_code || null,
     workType:     row.purpose         || null,
+    oftcode: row.oft || null,
     startDate:    row.work_start_date || null,
     endDate:      row.work_end_date   || null,
     durationDays: calcDuration(row.work_start_date, row.work_end_date),

@@ -33,6 +33,8 @@ async function successCallback(position) {
   
   let latitude = position.coords.latitude;
   let longitude = position.coords.longitude;
+  // let latitude = 40.7128; // new york city coords for testing
+  // let longitude = -74.0060;
   const accuracy = position.coords.accuracy; 
 
   const elements = [];
@@ -82,10 +84,10 @@ async function nearByClosureSearch(latitude, longitude) {
       let fromStreet = closure.from_street_name;
       let toStreet = closure.to_street_name;
       let closureElement = `
-          <div id=${id} class="closure-element">
-              <p>${onStreet}</p>
-              <p>From ${fromStreet} to ${toStreet}</p>
-          </div>
+          <a href="/closureDetail/${id}" class="closure-element">
+            <p>${onStreet}</p>
+            <p>From ${fromStreet} to ${toStreet}</p>
+          </a>
       `;
       elements.push(closureElement);
     }
@@ -103,17 +105,25 @@ async function nearByNYCClosureSearch(latitude, longitude) {
   let elements = [];
 
   if (closureResults.results) {
+    let seen = new Set();
     for (let closure of closureResults.results) {
       console.log(closure);
+
+      let oftCode = closure.oftcode; //since query returns closures with duplicate oftcodes
+      if (seen.has(oftCode)) {
+        continue;
+      } else {
+        seen.add(oftCode);
+      }
+
       let onStreet = closure.street;
-      let crossStreet = closure.crossStreet || "";
-      let end = formatDate(closure.endDate);
+      let toStreet = closure.toStreet || "";
+      let fromStreet = toStreet ? `${closure.fromStreet} to` : closure.fromStreet;
       let closureElement = `
-                <div class="closure-element">
+                <a href="/nycClosureDetail/${encodeURIComponent(closure.oftcode)}" class="closure-element">
                     <p>${onStreet}</p>
-                    <p>Cross Street: ${crossStreet}</p>
-                    <p>${isDatePast(end) ? 'Ended:' : 'Ending'}: ${end}</p>
-                </div>
+                    <p>From ${fromStreet}</p>
+                </a>
             `;
       elements.push(closureElement);
     }

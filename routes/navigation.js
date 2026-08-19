@@ -53,7 +53,7 @@ router.route('/savedStreets')
         try {
             id = helpers.checkId(req.session.user._id); // get id from logged in user
             const reqBody = req.body;
-            street = helpers.checkStreet(reqBody.save_street_input);
+            street = helpers.checkStreet(xss(reqBody.save_street_input));
         } catch (e) {
             return res.status(400).render("error", {
                 layout: 'home',
