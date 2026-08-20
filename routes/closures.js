@@ -106,7 +106,11 @@ router.post('/', async (req, res) => {
     const cleanFromStreetName = xss(from_street_name);
     const cleanToStreetName  = xss(to_street_name);
     const cleanDateReported  = xss(date_reported);
-    const cleanWorkEndDate   = xss(work_end_date);
+    // xss() turns null/undefined into "" which fails date validation --
+    // keep it null so ongoing closures (no end date) can be reported
+    const cleanWorkEndDate   = (work_end_date === null || work_end_date === undefined)
+      ? null
+      : xss(work_end_date);
 
     const newClosure = await closuresData.createClosure(
       cleanReportedBy,
