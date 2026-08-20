@@ -62,7 +62,7 @@ async function searchNearbyClosures() {
     );
 
     if (nearbyUserClosures)
-      elements.push(nearbyUserClosures);
+      elements.push(...nearbyUserClosures);
   } catch (e) {
     // console.error(e);
   }
@@ -75,9 +75,15 @@ async function searchNearbyClosures() {
     );
 
     if (nearbyNYCClosures)
-      elements.push(nearbyNYCClosures);
+      elements.push(...nearbyNYCClosures);
   } catch (e) {
     // console.error(e);
+  }
+
+  console.log(elements.length);
+  if (elements.length === 0) {
+    let noResultsElement = `<div>No nearby closures were found</div>`;
+    elements.push(noResultsElement);
   }
 
   $("#results").empty();
@@ -104,8 +110,8 @@ async function nearByClosureSearch(latitude, longitude, distance) {
   let elements = [];
 
   if (closureResults.length === 0) {
-    let noResultsElement = `<div>No nearby closures were found</div>`;
-    elements.push(noResultsElement);
+    // let noResultsElement = `<div>No nearby closures were found</div>`;
+    // elements.push(noResultsElement);
 
   } else {
     for (let closure of closureResults) {
@@ -156,7 +162,7 @@ async function nearByNYCClosureSearch(latitude, longitude, distance) {
       let toStreet = closure.toStreet || "";
       let fromStreet = toStreet ? `${closure.fromStreet} to` : closure.fromStreet;
       let closureElement = `
-                <a href="/nycClosureDetail/${encodeURIComponent(closure.oftcode)}" class="closure-element">
+                <a href="/nycClosureDetail/${encodeURIComponent(closure.oftcode)}/${encodeURIComponent(closure.startDate.slice(0, -1))}/${encodeURIComponent(closure.endDate.slice(0, -1))}" class="closure-element">
                     <p>${onStreet}</p>
                     <p>From ${fromStreet}</p>
                 </a>

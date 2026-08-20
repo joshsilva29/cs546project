@@ -17,10 +17,33 @@ router.get('/getClosure/:oftcode/:startDate/:endDate', async (req, res) => {
   const cleanStartDate = xss(startDate);
   const cleanEndDate = xss(endDate);
 
+  //nyc open data location database doesn't have real time of closure (sets it to 00:00)
+  //
+  //the other database does.
+  //
+  //to find the correct closure, the days without the time need to match.
+
+  const getNextDate = (dateStr) => {
+    let date = new Date(dateStr);
+    date.setUTCDate(date.getUTCDate() + 1);
+    return date.toISOString().slice(0, -1); //remove Z from date (messes with search)
+  };
+
+  //remove time from dates
+  const startDay = cleanStartDate.split("T")[0]; 
+  const endDay = cleanEndDate.split("T")[0];
+
+  //calculate the next day (for both the start and end dates)
+  const nextStartDate = getNextDate(startDay);
+  const nextEndDate = getNextDate(endDay);
+
+  //range from current day -> next day at midnight
   const where = `
-    oftcode='${cleanOftcode.replace(/'/g, "''")}' AND 
-    workstartdate='${cleanStartDate}' AND 
-    workenddate='${cleanEndDate}'
+      oftcode='${cleanOftcode.replace(/'/g, "''")}' AND 
+      workstartdate >= '${startDay}T00:00:00.000' AND
+      workstartdate < '${nextStartDate}' AND
+      workenddate >= '${endDay}T00:00:00.000' AND
+      workenddate < '${nextEndDate}'
   `;
 
   try {
