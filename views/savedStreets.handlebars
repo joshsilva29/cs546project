@@ -19,12 +19,13 @@
 
 <h2>Your Saved Streets</h2>
 {{#if savedStreets}}
-<ul>
+<ul id="saved-street-list">
   {{#each savedStreets}}
-  <li>
+  <li class="saved-street-list-item">
     <div class="saved-street">
       {{this}}
     </div>
+    <button class="delete-btn" data-id="{{this}}">Delete</button>
   </li>
   {{/each}}
 </ul>
