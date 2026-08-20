@@ -1,3 +1,6 @@
+let userLatitude;
+let userLongitude; 
+
 function formatDate(dateString) {
   const date = new Date(dateString);
 
@@ -30,50 +33,85 @@ function getUserLocation() {
 
 
 async function successCallback(position) {
-  
-  let latitude = position.coords.latitude;
-  let longitude = position.coords.longitude;
-  const accuracy = position.coords.accuracy; 
+
+  userLatitude = position.coords.latitude;
+  userLongitude = position.coords.longitude;
+
+  await searchNearbyClosures();
+}
+
+async function searchNearbyClosures() {
+
+  const distance = Number($("#distance").val());
+
+  if (!distance || distance <= 0) {
+    alert("Please enter a valid distance.");
+    return;
+  }
+
+  $("#results").empty();
+  $("#results").append("<div>Loading...</div>");
 
   const elements = [];
 
-  let nearbyUserClosures, nearbyNYCClosures = [];
   try {
-    nearbyUserClosures = await nearByClosureSearch(latitude, longitude);
+    const nearbyUserClosures = await nearByClosureSearch(
+      userLatitude,
+      userLongitude,
+      distance
+    );
+
+    if (nearbyUserClosures)
+      elements.push(...nearbyUserClosures);
   } catch (e) {
-    alert("There was an error fetching nearby closures");
-    console.log(e);
+    // console.error(e);
   }
-  
+
   try {
-    nearbyNYCClosures = await nearByNYCClosureSearch(latitude, longitude);
+    const nearbyNYCClosures = await nearByNYCClosureSearch(
+      userLatitude,
+      userLongitude,
+      distance
+    );
+
+    if (nearbyNYCClosures)
+      elements.push(...nearbyNYCClosures);
   } catch (e) {
-    alert("There was an error fetching nearby NYC database closures");
-    console.log(e);
+    // console.error(e);
   }
-   
-  elements.push(nearbyUserClosures);
-  elements.push(nearbyNYCClosures)
 
+  console.log(elements.length);
+  if (elements.length === 0) {
+    let noResultsElement = `<div>No nearby closures were found</div>`;
+    elements.push(noResultsElement);
+  }
 
-  $("#results").empty(); //remove loading
+  $("#results").empty();
+
   for (let element of elements) {
     $("#results").append(element);
   }
 }
 
 // search from mongodb database
-async function nearByClosureSearch(latitude, longitude) {
+async function nearByClosureSearch(latitude, longitude, distance) {
+  let response;
 
-  const response = await fetch(`/closures/nearYou?latitude=${latitude}&longitude=${longitude}&maxDistanceMiles=10`);
+  try {
+    response = await fetch(
+      `/closures/nearYou?latitude=${latitude}&longitude=${longitude}&maxDistanceMiles=${distance}`
+    );
+  } catch (e) {
+    return [];
+  }
 
   const closureResults = await response.json();
 
   let elements = [];
 
   if (closureResults.length === 0) {
-    let noResultsElement = `<div>No nearby closures were found</div>`;
-    elements.push(noResultsElement);
+    // let noResultsElement = `<div>No nearby closures were found</div>`;
+    // elements.push(noResultsElement);
 
   } else {
     for (let closure of closureResults) {
@@ -82,10 +120,10 @@ async function nearByClosureSearch(latitude, longitude) {
       let fromStreet = closure.from_street_name;
       let toStreet = closure.to_street_name;
       let closureElement = `
-          <div id=${id} class="closure-element">
-              <p>${onStreet}</p>
-              <p>From ${fromStreet} to ${toStreet}</p>
-          </div>
+          <a href="/closureDetail/${id}" class="closure-element">
+            <p>${onStreet}</p>
+            <p>From ${fromStreet} to ${toStreet}</p>
+          </a>
       `;
       elements.push(closureElement);
     }
@@ -95,25 +133,39 @@ async function nearByClosureSearch(latitude, longitude) {
 }
 
 // from NYC data
-async function nearByNYCClosureSearch(latitude, longitude) {
-  const response = await fetch(`/closureNearYou?lat=${latitude}&lon=${longitude}`); 
+async function nearByNYCClosureSearch(latitude, longitude, distance) {
+  let response; 
+  try {
+    response = await fetch(
+      `/closureNearYou?lat=${latitude}&lon=${longitude}&miles=${distance}`
+    );
+  } catch (e) {
+    return [];
+  }
 
   const closureResults = await response.json();
 
   let elements = [];
 
   if (closureResults.results) {
+    let seen = new Set();
     for (let closure of closureResults.results) {
-      console.log(closure);
+
+      let oftCode = closure.oftcode; //since query returns closures with duplicate oftcodes
+      if (seen.has(oftCode)) {
+        continue;
+      } else {
+        seen.add(oftCode);
+      }
+
       let onStreet = closure.street;
-      let crossStreet = closure.crossStreet || "";
-      let end = formatDate(closure.endDate);
+      let toStreet = closure.toStreet || "";
+      let fromStreet = toStreet ? `${closure.fromStreet} to` : closure.fromStreet;
       let closureElement = `
-                <div class="closure-element">
+                <a href="/nycClosureDetail/${encodeURIComponent(closure.oftcode)}/${encodeURIComponent(closure.startDate.slice(0, -1))}/${encodeURIComponent(closure.endDate.slice(0, -1))}" class="closure-element">
                     <p>${onStreet}</p>
-                    <p>Cross Street: ${crossStreet}</p>
-                    <p>${isDatePast(end) ? 'Ended:' : 'Ending'}: ${end}</p>
-                </div>
+                    <p>From ${fromStreet}</p>
+                </a>
             `;
       elements.push(closureElement);
     }
@@ -139,9 +191,8 @@ function errorCallback(error) {
   }
 }
 
-let loading = "<div>Loading...</div>";
-
-$("#results").empty();
-$("#results").append(loading);
+$("#search-button").on("click", function () {
+  searchNearbyClosures();
+});
 
 getUserLocation();

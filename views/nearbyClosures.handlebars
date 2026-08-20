@@ -1,5 +1,15 @@
 <h1>Nearby Closures</h1>
 
+<div id="distance-filter">
+  <label for="distance">Search within:</label>
+
+  <input type="number" id="distance" min="1" max="100" step="1" value="10">
+
+  <span>miles</span>
+
+  <button id="search-button">Search</button>
+</div>
+
 <div id="results"></div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>

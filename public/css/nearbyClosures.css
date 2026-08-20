@@ -1,6 +1,8 @@
 .closure-element {
   border: 1px solid black;
+  width: 95%;
   padding-left: 1rem;
+  border-radius: 0.4rem;
 }
 
 .selected-class {
@@ -18,4 +20,32 @@
   margin-top: 0.2rem;
   overflow-y: auto;
   scrollbar-color: #888 transparent;
+}
+
+#distance-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+#distance {
+  width: 80px;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+#search-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+#search-button:hover {
+  background: #0056b3;
 }

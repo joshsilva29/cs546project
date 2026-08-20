@@ -27,6 +27,7 @@ async function fetchFrom(baseUrl, params = {}) {
   if (params.$select) url.searchParams.set('$select', params.$select);
   if (params.$offset) url.searchParams.set('$offset', params.$offset);
 
+  // console.log(url.toString());
   const response = await fetch(url.toString());
 
   if (!response.ok) {
