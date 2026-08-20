@@ -25,7 +25,7 @@ $("#saved-street-list").click(async (event) => {
 
             // 4. Update the UI if the server confirms deletion
             if (response.ok) {
-                event.target.closest('.saved-street').remove();
+                event.target.closest('.saved-street-list-item').remove();
             } else {
                 alert('Server refused to delete item.');
             }
