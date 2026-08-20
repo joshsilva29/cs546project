@@ -1,34 +1,16 @@
 ﻿<h1>Notifications</h1>
-
 {{#if hasNotifications}}
-
-<button id="mark_all_read">Mark all as read</button>
-
 <div class="notification-list">
   {{#each notifications}}
-  <div class="notification {{#unless read}}unread{{/unless}}">
-    <img class="notification-image" src="/public/images/notification.png" alt="">
-    <div class="notification-body">
-      <a href="/closureDetail/{{closure_id}}">{{message}}</a>
-      <span class="notification-date">{{created_at}}</span>
+  <a class="notification" href="/closureDetail/{{this.closureId}}">
+    <img class="notification-image" src="/public/images/notification.png" alt="Closure alert">
+    <div class="notification-text">
+      <span class="notification-title">Closure reported on {{this.street}}</span>
+      <span class="notification-meta">Matches your saved street "{{this.savedStreet}}" &middot; Reported {{this.dateReported}}{{#if this.lastConfirmed}} &middot; Still closed as of {{this.lastConfirmed}}{{/if}} &middot; {{#if this.ongoing}}Ongoing{{else}}Ends {{this.endDate}}{{/if}}</span>
     </div>
-    {{#unless read}}
-    <button class="mark-read-button" data-id="{{_id}}">Mark read</button>
-    {{/unless}}
-  </div>
+  </a>
   {{/each}}
 </div>
-
 {{else}}
-
-<p id="no-notifications">
-  No notifications yet. Save streets you care about on the
-  <a href="/savedStreets">Saved Streets</a> page and you'll be notified when
-  closures are reported on them.
-</p>
-
+<p class="no-notifications">No notifications yet. <a href="/savedStreets">Save a street</a> to get alerts when closures are reported on it.</p>
 {{/if}}
-
-<script src="https://code.jquery.com/jquery-3.5.1.js"
-integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
-<script src="/public/js/notifications.js"></script>
