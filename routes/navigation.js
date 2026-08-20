@@ -185,6 +185,29 @@ router.route('/savedStreets')
                 loggedIn: req.session.user ? true : false
             });
         }
+    })
+    .delete(async (req, res) => {
+        let street, id;
+
+        try {
+            id = helpers.checkId(req.session.user._id); // get id from logged in user
+            const reqBody = req.body;
+            street = helpers.checkStreet(xss(reqBody.street));
+        } catch (e) {
+            return res.status(400).render("error", {
+                layout: 'home',
+                title: "Error",
+                error: e,
+                loggedIn: req.session.user ? true : false
+            });
+        }
+
+        try {
+            const deletedStreet = await users.removeUserPlace(id, street);
+            return res.json(deletedStreet);
+        } catch (e) {
+            return res.status(400).json({error: e});
+        }
     });
 
 router.get('/nearbyClosures', async (req, res) => {
