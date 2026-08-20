@@ -101,3 +101,14 @@ export const checkSource = (source) => {
   }
   return source;
 };
+
+// notification types whitelist (used by data/notifications.js)
+export const NOTIFICATION_TYPES = ['saved_street_closure', 'closure_update', 'corroboration'];
+
+export const checkNotificationType = (type) => {
+  type = checkString(type, 'notification type');
+  if (!NOTIFICATION_TYPES.includes(type)) {
+    throw `Error: notification type must be one of: ${NOTIFICATION_TYPES.join(', ')}.`;
+  }
+  return type;
+};

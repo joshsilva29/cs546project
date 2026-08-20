@@ -1,4 +1,4 @@
-// data/index.js
+﻿// data/index.js
 // Single import surface for every data layer.potentially that we can work on
 // Routes import from here so adding a new layer is like a one line code change
 // 
@@ -10,6 +10,8 @@
 
 import * as usersData from './users.js';
 import * as closuresData from './closures.js';
+import * as notificationsData from './notifications.js';
 
 export { usersData };
 export { closuresData };
+export { notificationsData };

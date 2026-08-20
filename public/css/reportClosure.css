@@ -1,0 +1,62 @@
+﻿#report_closure_form {
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-field input[type="text"],
+.form-field input[type="date"] {
+  padding: 6px 8px;
+  font-size: 1rem;
+}
+
+fieldset.form-field {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  gap: 6px;
+}
+
+#location-section {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#location_status {
+  font-size: 0.9rem;
+}
+
+.location-error {
+  color: #b00020;
+}
+
+.error-list {
+  color: #b00020;
+  border: 1px solid #b00020;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+#success-banner {
+  color: #1a7f37;
+  border: 1px solid #1a7f37;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  max-width: 480px;
+}
+
+#submit_report {
+  padding: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+}
