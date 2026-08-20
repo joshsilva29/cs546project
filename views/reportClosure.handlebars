@@ -64,8 +64,8 @@
   </fieldset>
 
   <div class="form-field" id="location-section">
-    <button type="button" id="use_location_button">Use my current location</button>
-    <button type="button" id="clear_location_button" hidden>Remove location</button>
+    <button type="button" id="use_location_button" class="form-button">Use my current location</button>
+    <button type="button" id="clear_location_button" class="form-button" hidden>Remove location</button>
     <span id="location_status"></span>
     <input type="hidden" id="latitude" name="latitude" value="{{formData.latitude}}">
     <input type="hidden" id="longitude" name="longitude" value="{{formData.longitude}}">
@@ -73,7 +73,7 @@
 
   <div id="client-error" class="error-list" hidden></div>
 
-  <button type="submit" id="submit_report">Submit report</button>
+  <button type="submit" id="submit_report" class="form-button">Submit report</button>
 
 </form>
 

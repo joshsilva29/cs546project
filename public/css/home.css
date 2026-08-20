@@ -12,7 +12,7 @@ body {
 }
 
 main {
-  padding: var(--main-padding);
+  padding: 0.8rem 2.3rem;
 }
 
 button {

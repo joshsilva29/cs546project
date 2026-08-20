@@ -129,7 +129,7 @@ const userClosure2 = await closuresData.createClosure(
 
 const userClosure3 = await closuresData.createClosure(
   jane._id.toString(),
-  '34th',
+  'W 34th',
   '5th',
   '6th',
   '2026-06-01',
@@ -313,6 +313,159 @@ const userClosure16 = await closuresData.createClosure(
   true
 );
 
+//empire state building (active)
+const userClosure17 = await closuresData.createClosure(
+  samuel._id.toString(),
+  'W 33rd St',
+  'Broadway',
+  '5th Ave',
+  '2026-05-28',
+  null,
+  {latitude: 40.748457, longitude: -73.986555},
+  true,
+  false,
+  false
+);
+
+//empire state building (active)
+const userClosure18 = await closuresData.createClosure(
+  rebecca._id.toString(),
+  'W 34th St',
+  'Broadway',
+  '5th Ave',
+  '2025-05-28',
+  '2025-07-28',
+  {latitude: 40.749115, longitude: -73.986136},
+  true,
+  false,
+  false
+);
+
+//queens - vernon blvd (inactive)
+const userClosure19 = await closuresData.createClosure(
+  aaron._id.toString(),
+  'Vernon Blvd',
+  '51st Ave',
+  'Borden Ave',
+  '2024-05-16',
+  '2024-07-19',
+  {latitude: 40.741727, longitude: -73.954466},
+  true,
+  true,
+  false
+);
+
+//queens - vernon blvd (active)
+const userClosure20 = await closuresData.createClosure(
+  josh._id.toString(),
+  'Vernon Blvd',
+  '44th Ave',
+  '43rd Rd',
+  '2026-08-10',
+  null,
+  {latitude: 40.751796, longitude: -73.951468},
+  true,
+  false,
+  false
+);
+
+//queens: astoria - steinway (active)
+const userClosure21 = await closuresData.createClosure(
+  alex._id.toString(),
+  'Steinway',
+  '31st Ave',
+  '30th Ave',
+  '2026-08-11',
+  null,
+  {latitude: 40.762552, longitude: -73.916072},
+  true,
+  false,
+  false
+);
+
+//west of jackie kennedy reservoir in central park (active)
+const userClosure22 = await closuresData.createClosure(
+  paul._id.toString(),
+  'Columbus Ave',
+  'W 89th St',
+  'W 90th St',
+  '2026-07-15',
+  null,
+  {latitude: 40.788740, longitude: -73.970535},
+  true,
+  false,
+  false
+);
+
+//west of jackie kennedy reservoir in central park (inactive)
+const userClosure23 = await closuresData.createClosure(
+  jerry._id.toString(),
+  'W 93rd St',
+  'Amsterdam Ave',
+  'Columbus Ave',
+  '2026-07-15',
+  null,
+  {latitude: 40.791580, longitude: -73.970408},
+  true,
+  false,
+  false
+);
+
+//by kips bay amc (inactive)
+const userClosure24 = await closuresData.createClosure(
+  john._id.toString(),
+  '2nd Ave',
+  'E 31st St',
+  'E 32nd St',
+  '2026-07-15',
+  '2026-07-25',
+  {latitude: 40.743223, longitude: -73.977022},
+  true,
+  false,
+  false
+);
+
+//by kips bay amc (inactive)
+const userClosure25 = await closuresData.createClosure(
+  john._id.toString(),
+  '2nd Ave',
+  'E 31st St',
+  'E 32nd St',
+  '2026-07-15',
+  '2026-07-25',
+  {latitude: 40.743223, longitude: -73.977022},
+  true,
+  false,
+  false
+);
+
+//tompkins square park (active)
+const userClosure26 = await closuresData.createClosure(
+  john._id.toString(),
+  'Avenue B',
+  'E 7th St',
+  'E 8th St',
+  '2026-07-15',
+  null,
+  {latitude: 40.725433, longitude: -73.981002},
+  true,
+  false,
+  true
+);
+
+//next to madison square garden (inactive)
+const userClosure27 = await closuresData.createClosure(
+  john._id.toString(),
+  'W 34 St',
+  '8th Ave',
+  '9th Ave',
+  '2026-05-15',
+  '2026-08-15',
+  {latitude: 40.752971, longitude: -73.995200},
+  true,
+  false,
+  true
+);
 
 console.log('Seeded user-reported closures.');
 
@@ -321,9 +474,15 @@ console.log('Seeded user-reported closures.');
 await closuresData.corroborateClosure(userClosure1._id.toString(), john._id.toString());
 await closuresData.corroborateClosure(userClosure1._id.toString(), alex._id.toString());
 await closuresData.corroborateClosure(userClosure3._id.toString(), john._id.toString());
+await closuresData.corroborateClosure(userClosure4._id.toString(), john._id.toString());
 await closuresData.corroborateClosure(userClosure12._id.toString(), josh._id.toString());
 await closuresData.corroborateClosure(userClosure12._id.toString(), carlos._id.toString());
 await closuresData.corroborateClosure(userClosure8._id.toString(), alex._id.toString());
+await closuresData.corroborateClosure(userClosure5._id.toString(), alex._id.toString());
+await closuresData.corroborateClosure(userClosure17._id.toString(), alex._id.toString());
+await closuresData.corroborateClosure(userClosure18._id.toString(), alex._id.toString());
+await closuresData.corroborateClosure(userClosure17._id.toString(), john._id.toString());
+await closuresData.corroborateClosure(userClosure18._id.toString(), john._id.toString());
 
 console.log('Seeded corroborations.');
 
@@ -438,6 +597,21 @@ await closuresData.addComment(
   userClosure15._id.toString(),
   "Construction only takes place in the morning.",
   alex._id.toString()
+);
+await closuresData.addComment(
+  userClosure17._id.toString(),
+  "realllly loud",
+  josh._id.toString()
+);
+await closuresData.addComment(
+  userClosure17._id.toString(),
+  "construction usually stops at 3 pm",
+  jerry._id.toString()
+);
+await closuresData.addComment(
+  userClosure18._id.toString(),
+  "Heard they'd be done soon.",
+  rebecca._id.toString()
 );
 
 

@@ -109,7 +109,7 @@ router
         req.body.password = xss(helpers.checkString(req.body.password, "Password"));
         let user = await usersData.authenticateUser(req.body.email, req.body.password);
         req.session.user = user;
-        return res.redirect('/nearbyClosures');
+        return res.redirect('/notifications');
     } catch (e) {
         return res.render("login", {
           layout: 'home',
