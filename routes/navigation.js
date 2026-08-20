@@ -10,6 +10,10 @@ const router = Router();
 // NOTE: GET /notifications used to be a placeholder here -- it now lives in
 // routes/notifications.js (mounted at /notifications in routes/index.js).
 
+router.get('/', async (req, res) => {
+    return res.redirect("/notifications");
+});
+
 router.get('/search', async (req, res) => {
     return res.render("search", {
         layout: 'home',

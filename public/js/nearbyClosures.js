@@ -80,7 +80,7 @@ async function searchNearbyClosures() {
     // console.error(e);
   }
 
-  console.log(elements.length);
+  // console.log(elements.length);
   if (elements.length === 0) {
     let noResultsElement = `<div>No nearby closures were found</div>`;
     elements.push(noResultsElement);

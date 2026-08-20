@@ -313,6 +313,35 @@ const userClosure16 = await closuresData.createClosure(
   true
 );
 
+//empire state building (active)
+const userClosure17 = await closuresData.createClosure(
+  samuel._id.toString(),
+  'W 33rd St',
+  'Broadway',
+  '5th Ave',
+  '2026-05-28',
+  null,
+  {latitude: 40.748457, longitude: -73.986555},
+  true,
+  false,
+  false
+);
+
+//empire state building (active)
+const userClosure18 = await closuresData.createClosure(
+  rebecca._id.toString(),
+  'W 34th St',
+  'Broadway',
+  '5th Ave',
+  '2025-05-28',
+  '2025-07-28',
+  {latitude: 40.749115, longitude: -73.986136},
+  true,
+  false,
+  false
+);
+
+
 
 console.log('Seeded user-reported closures.');
 
