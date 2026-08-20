@@ -58,19 +58,22 @@ async function closureSearch(street) {
 
     if (closureType === "all") {
         try {
-            response = await fetch(`/closures/closureSearch?street=${street}`);
+            let requestConfig = {
+                method: "GET",
+                url: `/closures/closureSearch?street=${street}`
+            }
+            closureResults = await $.ajax(requestConfig);
         } catch (e) {
             console.error(e);
         }
     } else {
         try {
             response = await fetch(`/closures/closureHistoryFiltered?street=${street}&status=${closureType}`);
+            closureResults = await response.json();
         } catch (e) {
             console.error(e);
         }
     }
-
-    closureResults = await response.json();
 
     // console.log(closureResults);
     let elements = [];
