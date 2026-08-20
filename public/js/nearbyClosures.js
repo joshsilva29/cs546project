@@ -96,20 +96,20 @@ async function searchNearbyClosures() {
 // search from mongodb database
 async function nearByClosureSearch(latitude, longitude, distance) {
   let response;
+  let closureResults;
 
   try {
     response = await fetch(
       `/closures/nearYou?latitude=${latitude}&longitude=${longitude}&maxDistanceMiles=${distance}`
     );
+    closureResults = await response.json();
   } catch (e) {
     return [];
   }
 
-  const closureResults = await response.json();
-
   let elements = [];
 
-  if (closureResults.length === 0) {
+  if (!closureResults || closureResults.length === 0) {
     // let noResultsElement = `<div>No nearby closures were found</div>`;
     // elements.push(noResultsElement);
 

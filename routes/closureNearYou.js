@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { nycGeoFetch, BOROUGH_NAMES, BOROUGH_CODES } from '../nycApi.js';
+import { nycGeoFetch, BOROUGH_NAMES, BOROUGH_CODES } from '../data/nycApi.js';
  
 const router = Router();
  

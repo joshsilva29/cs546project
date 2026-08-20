@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { nycFetch } from '../nycApi.js';
+import { nycFetch } from '../data/nycApi.js';
  
 const router = Router();
  
