@@ -97,36 +97,33 @@ async function searchNearbyClosures() {
 async function nearByClosureSearch(latitude, longitude, distance) {
   let response;
   let closureResults;
+  let elements = [];
 
   try {
     response = await fetch(
       `/closures/nearYou?latitude=${latitude}&longitude=${longitude}&maxDistanceMiles=${distance}`
     );
     closureResults = await response.json();
-  } catch (e) {
-    return [];
-  }
-
-  let elements = [];
-
-  if (!closureResults || closureResults.length === 0) {
+    if (!closureResults || closureResults.length === 0) {
     // let noResultsElement = `<div>No nearby closures were found</div>`;
     // elements.push(noResultsElement);
-
-  } else {
-    for (let closure of closureResults) {
-      let id = closure._id;
-      let onStreet = closure.on_street_name;
-      let fromStreet = closure.from_street_name;
-      let toStreet = closure.to_street_name;
-      let closureElement = `
-          <a href="/closureDetail/${id}" class="closure-element">
-            <p>${onStreet}</p>
-            <p>From ${fromStreet} to ${toStreet}</p>
-          </a>
-      `;
-      elements.push(closureElement);
+    } else {
+      for (let closure of closureResults) {
+        let id = closure._id;
+        let onStreet = closure.on_street_name;
+        let fromStreet = closure.from_street_name;
+        let toStreet = closure.to_street_name;
+        let closureElement = `
+            <a href="/closureDetail/${id}" class="closure-element">
+              <p>${onStreet}</p>
+              <p>From ${fromStreet} to ${toStreet}</p>
+            </a>
+        `;
+        elements.push(closureElement);
+      }
     }
+  } catch (e) {
+    return [];
   }
 
   return elements;
