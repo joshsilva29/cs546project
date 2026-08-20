@@ -1,4 +1,4 @@
-import {dbConnection} from './mongoConnection.js';
+﻿import {dbConnection} from './mongoConnection.js';
 
 const getCollectionFn = (collection) => {
   let _col = undefined;
@@ -16,6 +16,7 @@ const getCollectionFn = (collection) => {
 // collection list below
 export const userCollection = getCollectionFn('users');
 export const closureCollection = getCollectionFn('closures');
+export const notificationCollection = getCollectionFn('notifications');
 
 // commentsCollection is unnecessary if comments is a subdocument under closures 
 // export const commentCollection = getCollectionFn('comments');

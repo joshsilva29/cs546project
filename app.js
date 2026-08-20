@@ -1,6 +1,6 @@
 import express from 'express';
 import configureRoutes from './routes/index.js';
-import { usersData, closuresData } from './data/index.js';
+import { usersData, closuresData, notificationsData } from './data/index.js';
 import exphbs from 'express-handlebars';
 import session from 'express-session';
 
@@ -63,6 +63,7 @@ configureRoutes(app);
 // Ensure database indexes exist before accepting requests.
 await usersData.ensureUserIndexes(); // unique email
 await closuresData.ensureClosureIndexes(); // text index for street lookups
+await notificationsData.ensureNotificationIndexes(); // per-user list + unread badge
 
 app.listen(3000, () => {
   console.log("Server is running on http://localhost:3000");

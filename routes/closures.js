@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { closuresData } from '../data/index.js';
+import { closuresData, notificationsData } from '../data/index.js';
 import xss from 'xss';
 
 const router = Router();
@@ -159,6 +159,9 @@ router.post('/:id/corroborate', async (req, res) => {
     const cleanId = xss(req.params.id);
     const cleanUserId = xss(userId);
     const updated = await closuresData.corroborateClosure(cleanId, cleanUserId);
+    // best-effort: tell the original reporter their closure was confirmed
+    try { await notificationsData.notifyClosureCorroborated(updated, cleanUserId); }
+    catch (err) { console.error('[corroborate] notification failed:', err); }
     return res.json(updated);
   } catch (e) {
     return res.status(400).json({ error: e });
@@ -190,6 +193,9 @@ router.patch('/:id/endDate', async (req, res) => {
     const cleanId = xss(req.params.id);
     const cleanWorkEndDate = xss(work_end_date);
     const updated = await closuresData.setClosureEndDate(cleanId, cleanWorkEndDate);
+    // best-effort: tell users who saved this street that an end date was set
+    try { await notificationsData.notifyClosureEnded(updated); }
+    catch (err) { console.error('[endDate] notification failed:', err); }
     return res.json(updated);
   } catch (e) {
     return res.status(400).json({ error: e });
@@ -201,6 +207,9 @@ router.delete('/:id', async (req, res) => {
   try {
     const cleanId = xss(req.params.id);
     const deleted = await closuresData.removeClosure(cleanId);
+    // clean up notifications that point at the deleted closure (no dead links)
+    try { await notificationsData.removeNotificationsForClosure(cleanId); }
+    catch (err) { console.error('[delete closure] notification cleanup failed:', err); }
     return res.json(deleted);
   } catch (e) {
     return res.status(400).json({ error: e });

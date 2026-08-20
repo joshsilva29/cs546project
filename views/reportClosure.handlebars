@@ -1,1 +1,82 @@
-<h1>Report Closure</h1>
+﻿<h1>Report a Closure</h1>
+
+{{#if success}}
+<div id="success-banner">
+  Your closure was reported successfully.
+  <a href="/closureDetail/{{closureId}}">View it here</a>.
+</div>
+{{/if}}
+
+{{#if errors}}
+<div id="server-error" class="error-list">
+  <p>Please fix the following:</p>
+  <ul>
+    {{#each errors}}
+    <li>{{this}}</li>
+    {{/each}}
+  </ul>
+</div>
+{{/if}}
+
+<form id="report_closure_form" action="/reportClosure" method="POST">
+
+  <div class="form-field">
+    <label for="on_street_name">Current street (where the closure is)</label>
+    <input type="text" id="on_street_name" name="on_street_name" maxlength="100"
+           value="{{formData.on_street_name}}">
+  </div>
+
+  <div class="form-field">
+    <label for="from_street_name">From street</label>
+    <input type="text" id="from_street_name" name="from_street_name" maxlength="100"
+           value="{{formData.from_street_name}}">
+  </div>
+
+  <div class="form-field">
+    <label for="to_street_name">To street</label>
+    <input type="text" id="to_street_name" name="to_street_name" maxlength="100"
+           value="{{formData.to_street_name}}">
+  </div>
+
+  <div class="form-field">
+    <label for="work_end_date">Expected end date (leave blank if ongoing)</label>
+    <input type="date" id="work_end_date" name="work_end_date"
+           value="{{formData.work_end_date}}">
+  </div>
+
+  <fieldset class="form-field">
+    <legend>What does it affect? (choose at least one)</legend>
+    <label>
+      <input type="checkbox" id="affects_sidewalk" name="affects_sidewalk"
+             {{#if formData.affects_sidewalk}}checked{{/if}}>
+      Sidewalk
+    </label>
+    <label>
+      <input type="checkbox" id="affects_roads" name="affects_roads"
+             {{#if formData.affects_roads}}checked{{/if}}>
+      Roads
+    </label>
+    <label>
+      <input type="checkbox" id="affects_bike_lanes" name="affects_bike_lanes"
+             {{#if formData.affects_bike_lanes}}checked{{/if}}>
+      Bike lanes
+    </label>
+  </fieldset>
+
+  <div class="form-field" id="location-section">
+    <button type="button" id="use_location_button">Use my current location</button>
+    <button type="button" id="clear_location_button" hidden>Remove location</button>
+    <span id="location_status"></span>
+    <input type="hidden" id="latitude" name="latitude" value="{{formData.latitude}}">
+    <input type="hidden" id="longitude" name="longitude" value="{{formData.longitude}}">
+  </div>
+
+  <div id="client-error" class="error-list" hidden></div>
+
+  <button type="submit" id="submit_report">Submit report</button>
+
+</form>
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"
+integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script src="/public/js/reportClosure.js"></script>
