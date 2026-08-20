@@ -1,9 +1,41 @@
+.notification-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 600px;
+}
+
 .notification {
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.notification:hover {
+  background: #f0f4fa;
 }
 
 .notification-image {
   width: 30px;
+}
+
+.notification-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.notification-title {
+  font-weight: bold;
+}
+
+.notification-meta {
+  font-size: 0.85em;
+  color: #555;
 }

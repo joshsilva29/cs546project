@@ -4,6 +4,7 @@
 
 import { closureCollection } from '../config/mongoCollections.js';
 import * as helpers from '../helpers.js';
+import { getUserById } from './users.js';
 import { ObjectId } from 'mongodb';
 
 // create text index for street lookups
@@ -43,6 +44,19 @@ export const createClosure = async (
   affects_roads = helpers.checkBoolean(affects_roads, 'affects_roads');
   affects_bike_lanes = helpers.checkBoolean(affects_bike_lanes, 'affects_bike_lanes');
 
+  // reports must belong to a real registered user, not just a well-formed id
+  await getUserById(reported_by);
+
+  // real-time accuracy guards: a report can't be dated in the future,
+  // and a closure can't end before it was reported
+  const reportedMs = Date.parse(date_reported);
+  if (reportedMs > Date.now()) {
+    throw 'date_reported cannot be in the future.';
+  }
+  if (work_end_date && Date.parse(work_end_date) < reportedMs) {
+    throw 'work_end_date cannot be before date_reported.';
+  }
+
   if (closure_location) {
     closure_location = {
       latitude: helpers.checkLatitude(closure_location.latitude),
@@ -69,6 +83,7 @@ export const createClosure = async (
     corroborated_count: 0,
     corroborated_by: [],
     comments: [],
+    last_confirmed_date: date_reported, // refreshed when a user corroborates report
   };
 
   const insertInfo = await closures.insertOne(newClosure);
@@ -111,7 +126,9 @@ export const getClosureDuration = async (id) => {
 export const getClosureHistory = async (street) => {
   street = helpers.checkString(street, 'street');
   const closures = await closureCollection();
-  const regex = new RegExp(street, 'i');
+  // escape regex special characters so input like "(" can't crash the query
+  const escaped = street.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(escaped, 'i');
   return await closures
     .find({
       $or: [
@@ -201,6 +218,9 @@ export const corroborateClosure = async (closureId, userId) => {
   const closures = await closureCollection();
   const closure = await getClosureById(closureId);
 
+  // corroborations must come from a real registered user
+  await getUserById(userId);
+
   if (closure.corroborated_by.includes(userId)) {
     throw 'User has already corroborated this closure.';
   }
@@ -210,6 +230,8 @@ export const corroborateClosure = async (closureId, userId) => {
     {
       $inc: { corroborated_count: 1 },
       $addToSet: { corroborated_by: userId },
+      // a corroboration is fresh evidence the road is still closed
+      $set: { last_confirmed_date: new Date().toISOString().slice(0, 10) },
     }
   );
   if (updateInfo.matchedCount === 0) throw 'No closure found with that id.';
@@ -219,6 +241,12 @@ export const corroborateClosure = async (closureId, userId) => {
 export const setClosureEndDate = async (closureId, work_end_date) => {
   closureId = helpers.checkId(closureId, 'closure id');
   work_end_date = helpers.checkDateString(work_end_date, 'work_end_date');
+
+  // a closure can't end before it was reported
+  const existing = await getClosureById(closureId);
+  if (Date.parse(work_end_date) < Date.parse(existing.date_reported)) {
+    throw 'work_end_date cannot be before date_reported.';
+  }
 
   const closures = await closureCollection();
   const updateInfo = await closures.updateOne(

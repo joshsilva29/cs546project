@@ -1,7 +1,16 @@
 <h1>Notifications</h1>
+{{#if hasNotifications}}
 <div class="notification-list">
-  <a class="notification" href="/closure/:someid">
-    <img class="notification-image" src="/public/images/notification.png">
-    Example Notification
+  {{#each notifications}}
+  <a class="notification" href="/closureDetail/{{this.closureId}}">
+    <img class="notification-image" src="/public/images/notification.png" alt="Closure alert">
+    <div class="notification-text">
+      <span class="notification-title">Closure reported on {{this.street}}</span>
+      <span class="notification-meta">Matches your saved street "{{this.savedStreet}}" &middot; Reported {{this.dateReported}}{{#if this.lastConfirmed}} &middot; Still closed as of {{this.lastConfirmed}}{{/if}} &middot; {{#if this.ongoing}}Ongoing{{else}}Ends {{this.endDate}}{{/if}}</span>
+    </div>
   </a>
+  {{/each}}
 </div>
+{{else}}
+<p class="no-notifications">No notifications yet. <a href="/savedStreets">Save a street</a> to get alerts when closures are reported on it.</p>
+{{/if}}
