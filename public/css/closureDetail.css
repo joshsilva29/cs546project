@@ -1,0 +1,93 @@
+#closure-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 600px;
+}
+
+#closure-details {
+  border: 1px solid #d0d5dd;
+  border-radius: 0.4rem;
+  padding: 1rem 1.2rem;
+  background: #ffffff;
+}
+
+#closure-details h2 {
+  margin-top: 0;
+}
+
+#closure-details p {
+  margin: 0.3rem 0;
+  color: #333;
+}
+
+#corroborate-btn {
+  align-self: flex-start;
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 0.4rem;
+  color: white;
+  background: #007bff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+#corroborate-btn:hover {
+  background-color: #0056b3;
+  box-shadow: inset 0 0 1px 1px #000;
+}
+
+#corroborate-message {
+  color: #1a7f37;
+}
+
+#comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+#comments-list > div {
+  border: 1px solid #d0d5dd;
+  border-radius: 0.4rem;
+  padding: 0.6rem 0.8rem;
+  background: #f0f4fa;
+}
+
+#comments-list p {
+  margin: 0.2rem 0;
+}
+
+#comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-width: 480px;
+}
+
+#comment_text {
+  padding: 0.4rem 0.6rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.4rem;
+}
+
+#comment-form button {
+  align-self: flex-start;
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 0.4rem;
+  color: white;
+  background: #007bff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+#comment-form button:hover {
+  background-color: #0056b3;
+  box-shadow: inset 0 0 1px 1px #000;
+}
+
+#comment-error {
+  color: #b00020;
+}
