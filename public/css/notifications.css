@@ -1,48 +1,41 @@
-﻿.notification {
+﻿.notification-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 600px;
+}
+
+.notification {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 10px;
-  padding: 10px;
-  border-bottom: 1px solid #e0e0e0;
+  gap: 12px;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
 }
 
-.notification.unread {
-  background: #eef3f8;
-  font-weight: 600;
+.notification:hover {
+  background: #f0f4fa;
 }
 
 .notification-image {
   width: 30px;
 }
 
-.notification-body {
+.notification-text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
 
-.notification-date {
-  font-size: 0.8rem;
-  color: #666;
-  font-weight: 400;
+.notification-title {
+  font-weight: bold;
 }
 
-.mark-read-button {
-  margin-left: auto;
-  cursor: pointer;
-}
-
-#mark_all_read {
-  margin-bottom: 10px;
-  cursor: pointer;
-}
-
-.notification-badge {
-  background: #b00020;
-  color: #fff;
-  border-radius: 10px;
-  font-size: 0.75rem;
-  padding: 1px 7px;
-  margin-left: 6px;
+.notification-meta {
+  font-size: 0.85em;
+  color: #555;
 }
