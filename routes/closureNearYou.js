@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { nycGeoFetch, BOROUGH_NAMES, BOROUGH_CODES } from '../data/nycApi.js';
+import * as helpers from '../helpers.js';
+import xss from 'xss';
  
 const router = Router();
  
@@ -41,7 +43,7 @@ function distanceMiles(lat1, lon1, lat2, lon2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-// Helper: escape single quotes for SoQL queries
+// Escape single quotes so a value is safe inside a SoQL string literal.
 const soqlEscape = s => s.replace(/'/g, "''");
 
 
@@ -84,22 +86,28 @@ function formatRow(row, originLat = null, originLon = null) {
   };
 }
 
-// Validate an optional borough parameter 
-// Returns {code} on success, or {error} if the name is unknown.
-function resolveBorough(borough) {
-  if (!borough) return {code: null};
-  const code = BOROUGH_CODES[borough.toUpperCase()];
+//VaLIDATORS
+//returns undefined when the param was not provided, and throws a 400 error message
+const checkBoroughCode = (borough) => {
+  if (borough === undefined) return undefined;
+  const cleaned = xss(helpers.checkString(borough, 'borough')).toUpperCase();
+  const code    = BOROUGH_CODES[cleaned];
   if (!code) {
-    return{
-      error: {
-        error: `Unknown borough: ${borough}`,
-        validBoroughs: Object.keys(BOROUGH_CODES)
-      }
-    };
+    throw `borough must be one of: ${Object.keys(BOROUGH_CODES).join(', ')}.`;
   }
-  return {code};
+  return { name: cleaned, code };
+};
 
-      }
+      //VALIDATE AN OPTIONAL SEARCH RADIUS IN MILES, DEFAULTS TO 1 MILE, MAX 10 MILES.
+const checkMiles = (miles) => {
+  if (miles === undefined) return 1;
+  const cleaned = xss(helpers.checkString(String(miles), 'miles'));
+  const num = Number(cleaned);
+  helpers.checkNumber(num, 'miles');
+  if (num <= 0 || num > 10) throw 'miles must be greater than 0';
+  return Math.min(num, 10);
+}
+
    
 // GET /closureNearYou
 //
@@ -113,31 +121,43 @@ function resolveBorough(borough) {
 router.get('/closureNearYou', async (req, res) => {
   const { lat, lon, miles, street, borough } = req.query;
 
-  const boroughResult = resolveBorough(borough);
-  if (boroughResult.error) return res.status(400).json(boroughResult.error);
-  const boroughCode = boroughResult.code;
+  //Borough is optional, but is shared by both modes-validate once up front.
+  let boroughInfo;
+  try {
+    boroughInfo = checkBoroughCode(borough);
+  } catch (e) {
+    return res.status(400).json({ error: e });
+  }
+
+  const boroughCode = boroughInfo?.code;
+  const boroughName = boroughInfo?.name;
  
 
    // MODE 1 — COORDINATE SEARCH (SoQL within_circle)
   //   /closureNearYou?lat=40.7128&lon=-74.0060
   //   /closureNearYou?lat=40.7128&lon=-74.0060&miles=2
-  if (lat && lon) {
-    const latitude  = parseFloat(lat);
-    const longitude = parseFloat(lon);
- 
-    if (isNaN(latitude) || isNaN(longitude)) {
-      return res.status(400).json({ error: '"lat" and "lon" must be valid numbers' });
-    }
- 
-    if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
-      return res.status(400).json({ error: 'Coordinates are out of valid range' });
+  if( lat !== undefined || lon !== undefined) {
+    let latitude, longitude, searchMiles;
+    try {
+      //Both are required together in this mode, 
+      const cleanLat = xss(helpers.checkString(String(lat), 'lat'));
+      const cleanLon = xss(helpers.checkString(String(lon), 'lon'));
+    
+
+// checkNycCoordinate validates the numeric range and confirms the points falls inside the five-borough bounding box
+const coords =helpers.checkNycCoordinates(Number(cleanLat), Number(cleanLon))
+latitude = coords.latitude;
+longitude = coords.longitude;
+
+searchMiles = checkMiles(miles);
+    } catch (e) {
+      return res.status(400).json({error: e})
     }
 
-    let searchMiles = parseFloat(miles) || 1;
-    if (isNaN(searchMiles) || searchMiles <= 0) searchMiles = 1;
-    searchMiles = Math.min(searchMiles, 10); // cap at 10 miles
+    const radiusMeters =Math.round(searchMiles *1609.34); // miles ->
 
-    const radiusMeters = Math.round(searchMiles * 1609.34); // miles → meters
+    // within_circle(pointColumn, latitude, longitude, radiusInMeters)
+
 
     const where =[
       `within_circle(the_geom, ${latitude}, ${longitude}, ${radiusMeters})`
@@ -170,7 +190,7 @@ router.get('/closureNearYou', async (req, res) => {
         count:      results.length,
         location:   { lat: latitude, lon: longitude },
         radius:     `${searchMiles} mile(s)`,
-        borough:    borough ? borough.toUpperCase() : 'all',
+        borough:    boroughName || 'all',
         results:    results.slice(0, 50),
       });
  
@@ -185,14 +205,21 @@ router.get('/closureNearYou', async (req, res) => {
   //   /closureNearYou?street=BROADWAY
   //   /closureNearYou?street=BROADWAY&borough=Manhattan
   
-   if (street) {
-    const cleanStreet = soqlEscape(street.toUpperCase());
+     if (street !== undefined) {
+    let cleanStreet;
+    try {
+      cleanStreet = xss(helpers.checkString(street, 'street'));
+    } catch (e) {
+      return res.status(400).json({ error: e.message || e });
+    }
+ 
+    const escapedStreet = soqlEscape(cleanStreet.toUpperCase());
  
     // Match the street as the closure's on-street OR as its cross-street,
-    // so "near BROADWAY" includes closures on intersecting blocks.
+    // so "near BROADWAY" also includes closures on intersecting blocks.
     const nameMatch =
-      `(upper(onstreetname) like '%${cleanStreet}%' ` +
-      `OR upper(fromstreetname) like '%${cleanStreet}%')`;
+      `(upper(onstreetname) like '%${escapedStreet}%' ` +
+      `OR upper(fromstreetname) like '%${escapedStreet}%')`;
  
     const where = [nameMatch];
     if (boroughCode) where.push(`borough_code='${boroughCode}'`);
@@ -208,7 +235,7 @@ router.get('/closureNearYou', async (req, res) => {
  
       if (!rows.length) {
         return res.status(404).json({
-          message: `No current closures found near: ${street}`,
+          message: `No current closures found near: ${cleanStreet}`,
           hint:    'This route covers current closures only. Try /closureHistory for past closures.',
         });
       }
@@ -219,8 +246,8 @@ router.get('/closureNearYou', async (req, res) => {
       return res.status(200).json({
         searchMode: 'street',
         count:      results.length,
-        street:     street.toUpperCase(),
-        borough:    borough ? borough.toUpperCase() : 'all',
+        street:     cleanStreet.toUpperCase(),
+        borough:    boroughName || 'all',
         results:    results.slice(0, 50),
       });
  
