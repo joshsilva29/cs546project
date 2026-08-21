@@ -1,28 +1,74 @@
 import { Router } from 'express';
 import { nycFetch } from '../data/nycApi.js';
+import * as helpers from '../helpers.js';
+import xss from 'xss';
  
 const router = Router();
+
+const VALID_BOROUGHS = ['MANHATTAN', 'BROOKLYN', 'QUEENS', 'BRONX', 'STATEN ISLAND'];
+
+//Validate an optional borough name. Returns undefined when not provided.
+const checkBorough = (borough) => {
+  if(borough === undefined)  return undefined;
+  const cleaned = xss(helpers.checkString(borough, 'borough')).toUpperCase();
+  if (!vALID_BOROUGHS.includes(cleaned)) {
+    throw `borough must be one of: ${VALID_BOROUGHS.join(', ')}`;
+  }
+  return cleaned;
+}
  
+//Validate an optional status. Returns undefined when not provided.
+const checkStatus = (status) => {
+  if(status === undefined) return undefined;
+  const cleaned = xss(helpers.checkString(status, 'status')).toLowerCase();
+  if(cleaned !== 'active' && cleaned !== 'past') {
+    throw 'status must be either "active" or "past"';
+  }
+  return cleaned;
+};
+
+//Validate an optional row limit. Returns a number between 1 and 100.
+const checkLimit = (limit) => {
+  if(limit === undefined) return 50; 
+  const cleaned = xss(helpers.checkString(String(limit), "limit"));
+  const num = Number(cleaned);
+  helpers.checkNumber(num, 'limit');
+  if (!Number.isInteger(num)) throw 'limit must be a whole number.';
+  if (num < 1) throw 'limit must be at least 1.';
+  return Math.min(num, 100); 
+};
+
 // GET — search closures by street name with optional filters
 // Usage: /closureSearch?street=BROADWAY
 //        /closureSearch?street=FLATBUSH AVE&borough=BROOKLYN&status=active
 router.get('/closureSearch', async (req, res) => {
   const { street, borough, status, limit } = req.query;
- 
-  if (!street) {
-    return res.status(400).json({ error: 'Query param "street" is required' });
+
+
+  //validate first, then sanitize -- checkString rejects arrays/objects before xss
+  //Sanitize input to prevent XSS attacks:
+  
+  let cleanStreet, cleanBorough, cleanStatus, rowLimit;
+  try {
+    cleanStreet  = xss(helpers.checkString(street, 'street'));
+    cleanBorough = checkBorough(borough);
+    cleanStatus  = checkStatus(status);
+    rowLimit     = checkLimit(limit);
+  }catch (e) {
+    return res.status(400).json({ error: e });
   }
+
  
   const now   = new Date().toISOString().slice(0, -1); //remove the 'Z' at the end of the timestamp;
   const where = [
-    `upper(onstreetname) like '%${street.toUpperCase().replace(/'/g, "''")}%'`
+    `upper(onstreetname) like '%${cleanStreet.toUpperCase().replace(/'/g, "''")}%'`
   ];
  
-  if (borough)             where.push(`upper(boroughname)=upper('${borough.replace(/'/g, "''")}')`);
-  if (status === 'active') where.push(`workenddate>='${now}'`);
-  if (status === 'past')   where.push(`workenddate<'${now}'`);
+  if (cleanBorough)             where.push(`upper(boroughname)=upper('${cleanBorough.replace(/'/g, "''")}')`);
+  if (cleanStatus === 'active') where.push(`workenddate>='${now}'`);
+  if (cleanStatus === 'past')   where.push(`workenddate<'${now}'`);
  
-  const rowLimit = Math.min(parseInt(limit) || 50, 100);
+ 
  
   try {
     const data = await nycFetch({
@@ -32,7 +78,7 @@ router.get('/closureSearch', async (req, res) => {
     });
  
     if (!data.length) {
-      return res.status(404).json({ message: `No closures found for street: ${street}` });
+      return res.status(404).json({ message: `No closures found for street: ${cleanStreet}` });
     }
  
     const results = data.map(row => {
@@ -67,9 +113,9 @@ router.get('/closureSearch', async (req, res) => {
     return res.status(200).json({
       count:   results.length,
       filters: {
-        street:  street.toUpperCase(),
-        borough: borough || 'all',
-        status:  status  || 'all',
+        street:  cleanStreet.toUpperCase(),
+        borough: cleanBorough || 'all',
+        status:  cleanStatus  || 'all',
       },
       results,
     });

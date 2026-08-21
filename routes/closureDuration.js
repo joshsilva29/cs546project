@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { nycFetch } from '../data/nycApi.js';
+import * as helpers from '../helpers.js';
+import xss from 'xss';
  
 const router = Router();
  
@@ -7,20 +9,25 @@ const router = Router();
 // Usage: /closureDuration?street=BROADWAY
 router.get('/closureDuration', async (req, res) => {
   const { street } = req.query;
- 
-  if (!street) {
-    return res.status(400).json({ error: 'Query param "street" is required' });
-  }
+
+  //Sanitize input to prevent XSS attacks:
+
+  let cleanStreet;
+  try {
+    cleanStreet = xss(helpers.checkString(street, 'street'));
+  } catch (e) {
+  return res.status(400).json({ error: e.message || e });
+}
  
   try {
     const data = await nycFetch({
       $limit: 30,
       $order: 'workstartdate DESC',
-      $where: `upper(onstreetname) like '%${street.toUpperCase().replace(/'/g, "''")}%'`,
+      $where: `upper(onstreetname) like '%${cleanStreet.toUpperCase().replace(/'/g, "''")}%'`,
     });
  
     if (!data.length) {
-      return res.status(404).json({ message: `No closures found for street: ${street}` });
+      return res.status(404).json({ message: `No closures found for street: ${cleanStreet}` });
     }
  
     const results = data.map(row => {
@@ -44,7 +51,7 @@ router.get('/closureDuration', async (req, res) => {
  
     return res.status(200).json({
       count: results.length,
-      street: street.toUpperCase(),
+      street: cleanStreet.toUpperCase(),
       results,
     });
  

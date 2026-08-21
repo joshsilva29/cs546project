@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { closuresData, notificationsData } from '../data/index.js';
+
 import xss from 'xss';
 
 const router = Router();
