@@ -104,7 +104,7 @@ const checkMiles = (miles) => {
   const cleaned = xss(helpers.checkString(String(miles), 'miles'));
   const num = Number(cleaned);
   helpers.checkNumber(num, 'miles');
-  if (num <= 0 || num > 10) throw 'miles must be greater than 0';
+  if (num <= 0 || num > 100) throw 'miles must be greater than 0';
   return Math.min(num, 10);
 }
 
@@ -138,7 +138,13 @@ router.get('/closureNearYou', async (req, res) => {
    // MODE 1 — COORDINATE SEARCH (SoQL within_circle)
   //   /closureNearYou?lat=40.7128&lon=-74.0060
   //   /closureNearYou?lat=40.7128&lon=-74.0060&miles=2
-  if( lat !== undefined || lon !== undefined) {
+  if (lat !== undefined || lon !== undefined) {
+    if (lat === undefined || lon === undefined) {
+      return res.status(400).json({
+        error: 'Both "lat" and "lon" are required'
+      });
+    }
+
     let latitude, longitude, searchMiles;
     try {
       //Both are required together in this mode, 
@@ -149,6 +155,13 @@ router.get('/closureNearYou', async (req, res) => {
       // const coords =helpers.checkNycCoordinates(Number(cleanLat), Number(cleanLon))
       // latitude = coords.latitude;
       // longitude = coords.longitude;
+
+// checkNycCoordinate validates the numeric range and confirms the points falls inside the five-borough bounding box
+// const coords =helpers.checkNycCoordinates(Number(cleanLat), Number(cleanLon))
+      latitude = Number(latitude);
+      longitude = Number(longitude);
+// latitude = coords.latitude;
+// longitude = coords.longitude;
 
       searchMiles = checkMiles(miles);
     } catch (e) {
@@ -173,11 +186,17 @@ router.get('/closureNearYou', async (req, res) => {
 
       const rows = dedupe(data);
 
-       if (!rows.length) {
-        return res.status(404).json({
-          message:  `No current closures found within ${searchMiles} mile(s) of your location.`,
-          location: { lat: latitude, lon: longitude },
-          radius:   `${searchMiles} mile(s)`,
+      if (!rows.length) {
+        return res.status(200).json({
+          searchMode: 'coordinates',
+          count: 0,
+          location: {
+            lat: latitude,
+            lon: longitude
+          },
+          radius: `${searchMiles} mile(s)`,
+          borough: boroughName || 'all',
+          results: []
         });
       }
 
