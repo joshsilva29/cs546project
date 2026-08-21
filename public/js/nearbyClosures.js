@@ -132,40 +132,38 @@ async function nearByClosureSearch(latitude, longitude, distance) {
 // from NYC data
 async function nearByNYCClosureSearch(latitude, longitude, distance) {
   let response; 
+  let elements = [];
   try {
     response = await fetch(
       `/closureNearYou?lat=${latitude}&lon=${longitude}&miles=${distance}`
     );
+    const closureResults = await response.json();
+
+    if (closureResults.results) {
+      let seen = new Set();
+      for (let closure of closureResults.results) {
+
+        let oftCode = closure.oftcode; //since query returns closures with duplicate oftcodes
+        if (seen.has(oftCode)) {
+          continue;
+        } else {
+          seen.add(oftCode);
+        }
+
+        let onStreet = closure.street;
+        let toStreet = closure.toStreet || "";
+        let fromStreet = toStreet ? `${closure.fromStreet} to` : closure.fromStreet;
+        let closureElement = `
+                  <a href="/nycClosureDetail/${encodeURIComponent(closure.oftcode)}/${encodeURIComponent(closure.startDate.slice(0, -1))}/${encodeURIComponent(closure.endDate.slice(0, -1))}" class="closure-element">
+                      <p>${onStreet}</p>
+                      <p>From ${fromStreet}</p>
+                  </a>
+              `;
+        elements.push(closureElement);
+      }
+    }
   } catch (e) {
     return [];
-  }
-
-  const closureResults = await response.json();
-
-  let elements = [];
-
-  if (closureResults.results) {
-    let seen = new Set();
-    for (let closure of closureResults.results) {
-
-      let oftCode = closure.oftcode; //since query returns closures with duplicate oftcodes
-      if (seen.has(oftCode)) {
-        continue;
-      } else {
-        seen.add(oftCode);
-      }
-
-      let onStreet = closure.street;
-      let toStreet = closure.toStreet || "";
-      let fromStreet = toStreet ? `${closure.fromStreet} to` : closure.fromStreet;
-      let closureElement = `
-                <a href="/nycClosureDetail/${encodeURIComponent(closure.oftcode)}/${encodeURIComponent(closure.startDate.slice(0, -1))}/${encodeURIComponent(closure.endDate.slice(0, -1))}" class="closure-element">
-                    <p>${onStreet}</p>
-                    <p>From ${fromStreet}</p>
-                </a>
-            `;
-      elements.push(closureElement);
-    }
   }
 
   return elements;
