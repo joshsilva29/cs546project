@@ -20,7 +20,7 @@ function calcDuration(start, end) {
 // Returns null if either date is missing.
 
 function calcStatus(start, end) {
-  if (!end) return 'unknown';
+  if (!end) throw "end duration does not exist";
   const now      = new Date();
   const endDate  = new Date(end);
   const startDate = start ? new Date(start) : null;
@@ -89,7 +89,7 @@ function formatRow(row, originLat = null, originLon = null) {
 //VaLIDATORS
 //returns undefined when the param was not provided, and throws a 400 error message
 const checkBoroughCode = (borough) => {
-  if (borough === undefined) return undefined;
+  if (borough === undefined) throw "borough is undefined";
   const cleaned = xss(helpers.checkString(borough, 'borough')).toUpperCase();
   const code    = BOROUGH_CODES[cleaned];
   if (!code) {
@@ -124,7 +124,9 @@ router.get('/closureNearYou', async (req, res) => {
   //Borough is optional, but is shared by both modes-validate once up front.
   let boroughInfo;
   try {
-    boroughInfo = checkBoroughCode(borough);
+    if (borough) {
+      boroughInfo = checkBoroughCode(borough);
+    }
   } catch (e) {
     return res.status(400).json({ error: e });
   }
@@ -146,18 +148,22 @@ router.get('/closureNearYou', async (req, res) => {
     let latitude, longitude, searchMiles;
     try {
       //Both are required together in this mode, 
-      const cleanLat = xss(helpers.checkString(String(lat), 'lat'));
-      const cleanLon = xss(helpers.checkString(String(lon), 'lon'));
+      latitude = xss(helpers.checkString(String(lat), 'lat'));
+      longitude = xss(helpers.checkString(String(lon), 'lon'));
     
+      // checkNycCoordinate validates the numeric range and confirms the points falls inside the five-borough bounding box
+      // const coords =helpers.checkNycCoordinates(Number(cleanLat), Number(cleanLon))
+      // latitude = coords.latitude;
+      // longitude = coords.longitude;
 
 // checkNycCoordinate validates the numeric range and confirms the points falls inside the five-borough bounding box
 // const coords =helpers.checkNycCoordinates(Number(cleanLat), Number(cleanLon))
-      latitude = Number(cleanLat);
-      longitude = Number(cleanLon);
+      latitude = Number(latitude);
+      longitude = Number(longitude);
 // latitude = coords.latitude;
 // longitude = coords.longitude;
 
-searchMiles = checkMiles(miles);
+      searchMiles = checkMiles(miles);
     } catch (e) {
       return res.status(400).json({error: e})
     }
@@ -219,7 +225,7 @@ searchMiles = checkMiles(miles);
   //   /closureNearYou?street=BROADWAY
   //   /closureNearYou?street=BROADWAY&borough=Manhattan
   
-     if (street !== undefined) {
+    if (street !== undefined) {
     let cleanStreet;
     try {
       cleanStreet = xss(helpers.checkString(street, 'street'));
